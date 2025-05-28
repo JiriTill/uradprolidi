@@ -1,3 +1,4 @@
+import './style.css';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import * as pdfjsLib from 'pdfjs-dist';
