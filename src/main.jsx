@@ -46,41 +46,16 @@ function App() {
   setOutput("Překládám...");
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer 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`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "Jsi pomocník, který překládá úřednickou řeč do jednoduché a srozumitelné češtiny pro běžné občany.",
-          },
-          {
-            role: "user",
-            content: `Přelož do srozumitelné češtiny:\n\n${combinedText}`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 1024,
-      }),
-    });
+    const response = await fetch("/api/simplify", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ input: combinedText }),
+});
 
     const data = await response.json();
-
-    if (data.choices && data.choices[0]) {
-      setOutput(data.choices[0].message.content.trim());
-    } else {
-      throw new Error("Neplatná odpověď od OpenAI.");
-    }
-  } catch (error) {
-    console.error("Chyba při volání OpenAI:", error);
-    setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
-  }
-};
+setOutput(data.output || "⚠️ Chyba při zpracování.");
 
   return (
     <div className="p-6 max-w-3xl mx-auto font-sans">
