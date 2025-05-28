@@ -32,20 +32,30 @@ Nyní následuje obsah dopisu:
 ${content}
 """`;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4",
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    temperature: 0.7,
-  });
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4-1106-preview",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+    });
 
-  return new Response(JSON.stringify({ result: response.choices[0].message.content }), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+    const result = response.choices[0].message.content;
+
+    return new Response(JSON.stringify({ result }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("OpenAI error:", error);
+    return new Response(
+      JSON.stringify({ error: "Chyba při zpracování odpovědi OpenAI." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 }
