@@ -64,11 +64,31 @@ function App() {
 
   const renderStructuredOutput = () => {
     const sections = output.split(/(?=\d+\. )/g);
-    return sections.map((section, index) => (
-      <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-        <p className="whitespace-pre-wrap text-gray-800">{section.trim()}</p>
-      </div>
-    ));
+    return sections.map((section, index) => {
+      const trimmed = section.trim();
+
+      if (trimmed.startsWith("6.")) {
+        const parts = trimmed.split(/- /g).map(p => p.trim()).filter(Boolean);
+        return (
+          <div key={index} className="bg-white border rounded shadow p-4 mb-4">
+            <h3 className="text-lg font-semibold mb-2">6. Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
+            <div className="space-y-2">
+              {parts.map((part, i) => (
+                <div key={i} className="bg-gray-50 border rounded p-3">
+                  <p className="text-gray-800 whitespace-pre-wrap">{part}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div key={index} className="bg-white border rounded shadow p-4 mb-4">
+          <p className="whitespace-pre-wrap text-gray-800">{trimmed}</p>
+        </div>
+      );
+    });
   };
 
   return (
@@ -122,3 +142,4 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
