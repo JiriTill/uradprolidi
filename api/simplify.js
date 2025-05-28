@@ -5,6 +5,23 @@ const openai = new OpenAI();
 export async function POST(request) {
   const { content } = await request.json();
 
+  // Fallback: zkrácení obsahu, pokud je příliš dlouhý
+  const trimmedContent = content.length > 3000 ? content.slice(0, 3000) : content;
+
+  // Zjednodušený fallback prompt
+  const fallbackPrompt = `Zjednoduš tento text pro běžného občana:
+
+"""
+${trimmedContent}
+"""
+
+Shrň:
+- O co se jedná?
+- Co se po adresátovi chce?
+- Kdy a jak to má udělat?
+Napiš to jednoduše.`;
+
+  // Hlavní prompt se strukturou
   const prompt = `Zjednoduš a srozumitelně shrň následující oficiální dokument. Výstup rozděl do těchto přehledných částí:
 
 1. Odesílatel: Kdo dopis poslal (instituce a jméno, pokud je uvedeno).
@@ -29,12 +46,12 @@ Poznámka ke zkratkám:
 Nyní následuje obsah dopisu:
 
 """
-${content}
+${trimmedContent}
 """`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4-1106-preview",
+      model: "gpt-4-1106-preview", // Případně změnit na gpt-3.5-turbo-0125
       messages: [
         {
           role: "user",
@@ -44,7 +61,11 @@ ${content}
       temperature: 0.7,
     });
 
-    const result = response.choices[0].message.content;
+    const result = response.choices?.[0]?.message?.content;
+
+    if (!result) {
+      throw new Error("Model nevrátil žádnou odpověď.");
+    }
 
     return new Response(JSON.stringify({ result }), {
       headers: {
@@ -53,9 +74,34 @@ ${content}
     });
   } catch (error) {
     console.error("OpenAI error:", error);
-    return new Response(
-      JSON.stringify({ error: "Chyba při zpracování odpovědi OpenAI." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+
+    // Fallback při chybě: použij jednoduchý prompt
+    try {
+      const fallbackResponse = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo-0125",
+        messages: [
+          {
+            role: "user",
+            content: fallbackPrompt,
+          },
+        ],
+        temperature: 0.7,
+      });
+
+      const fallbackResult = fallbackResponse.choices?.[0]?.message?.content || "Nepodařilo se zpracovat.";
+
+      return new Response(JSON.stringify({ result: fallbackResult }), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (fallbackError) {
+      console.error("Fallback error:", fallbackError);
+      return new Response(
+        JSON.stringify({ error: "Chyba při zpracování odpovědi OpenAI." }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
   }
 }
+
