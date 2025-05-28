@@ -3,40 +3,38 @@ import ReactDOM from 'react-dom/client';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
 function App() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
 
   const handlePDFUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file || !file.type.includes('pdf')) return;
+    const file = event.target.files[0];
+    if (!file || !file.type.includes('pdf')) return;
 
-  const reader = new FileReader();
-  reader.onload = async () => {
-    try {
-      const pdfjsLib = await import('pdfjs-dist/build/pdf');
-      import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-       pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+        const pdf = await loadingTask.promise;
+        let fullText = '';
 
-      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-      const pdf = await loadingTask.promise;
-      let fullText = '';
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const content = await page.getTextContent();
+          fullText += content.items.map((item) => item.str).join(' ') + '\n';
+        }
 
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const content = await page.getTextContent();
-        fullText += content.items.map((item) => item.str).join(' ') + '\n';
+        setPdfText(fullText);
+      } catch (error) {
+        console.error("Chyba při zpracování PDF:", error);
+        alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
       }
-
-      setPdfText(fullText);
-    } catch (error) {
-      console.error("Chyba při zpracování PDF:", error); // ← sem
-      alert('⚠️ Chyba při čtení PDF souboru.');
-    }
+    };
+    reader.readAsArrayBuffer(file);
   };
-  reader.readAsArrayBuffer(file);
-};
 
   const handleSubmit = async () => {
     const combinedText = pdfText || inputText;
@@ -59,12 +57,11 @@ function App() {
 
       const data = await response.json();
       setOutput(data.output || "⚠️ Chyba při zpracování.");
-    } catch (error) {
+    } catch (err) {
       setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
     }
   };
 
-  // Až tady je správné umístění návratu celé komponenty:
   return (
     <div className="p-6 max-w-3xl mx-auto font-sans">
       <h1 className="text-3xl font-bold mb-4">Úřad pro lidi</h1>
