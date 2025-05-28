@@ -112,30 +112,35 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 font-sans">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900">Úřad pro lidi</h1>
-        <p className="mb-6 text-gray-700">
+    <div className="min-h-screen bg-gray-100 py-10 px-4 font-sans flex justify-center">
+      <div className="w-full max-w-3xl">
+        <h1 className="text-4xl font-bold mb-4 text-gray-900 text-center">Úřad pro lidi</h1>
+        <p className="mb-6 text-gray-700 text-center">
           Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
         </p>
 
-        <textarea
-          placeholder="Sem vložte text z úřadu..."
-          className="w-full p-4 border border-gray-300 rounded mb-4 bg-white shadow"
-          rows={6}
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
+        <p className="mb-2 text-gray-700 font-medium">
+          Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
+        </p>
 
-        <input
-          type="file"
-          accept=".pdf"
-          onChange={handlePDFUpload}
-          className="mb-4"
-        />
+        <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+          <textarea
+            placeholder="Sem vložte text z úřadu..."
+            className="flex-1 p-4 border border-gray-300 rounded bg-white shadow mb-4 sm:mb-0"
+            rows={10}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+          />
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handlePDFUpload}
+            className="self-start sm:self-auto"
+          />
+        </div>
 
-        <div className="mb-4 text-sm text-gray-600">
-          <label className="block mb-1">
+        <div className="mb-6 text-sm text-gray-600 space-y-2">
+          <label className="block">
             <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
           </label>
           <label className="block">
@@ -144,7 +149,7 @@ function App() {
         </div>
 
         <button
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition mb-6 shadow"
+          className="bg-blue-600 text-white text-lg px-8 py-3 rounded hover:bg-blue-700 transition mb-10 shadow w-full sm:w-auto"
           onClick={handleSubmit}
         >
           Přelož do člověčiny
