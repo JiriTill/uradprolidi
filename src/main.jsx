@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
