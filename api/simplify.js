@@ -42,7 +42,7 @@ ${text}
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4-1106-preview",
+      model: "gpt-4-1106-preview", // Nebo "gpt-3.5-turbo-0125"
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -54,31 +54,16 @@ ${text}
     }
 
     return new Response(JSON.stringify({ result }), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
   } catch (error) {
-    console.error("OpenAI error:", error);
-
-    // Fallback s jednodušším modelem
-    try {
-      const fallbackResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo-0125",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-      });
-
-      const fallbackResult = fallbackResponse.choices?.[0]?.message?.content || "Nepodařilo se zpracovat.";
-
-      return new Response(JSON.stringify({ result: fallbackResult }), {
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (fallbackError) {
-      console.error("Fallback error:", fallbackError);
-      return new Response(
-        JSON.stringify({ error: "Chyba při zpracování odpovědi OpenAI." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    console.error("Chyba OpenAI:", error);
+    return new Response(
+      JSON.stringify({ result: "⚠️ Nepodařilo se zpracovat odpověď. Zkuste to později." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 
