@@ -56,7 +56,7 @@ function App() {
       });
 
       const data = await response.json();
-      setOutput(data.output || "⚠️ Chyba při zpracování.");
+      setOutput(data.result || "⚠️ Chyba při zpracování.");
     } catch (err) {
       setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
     }
