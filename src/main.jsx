@@ -61,6 +61,7 @@ function App() {
     }
   };
 
+  // Až tady je správné umístění návratu celé komponenty:
   return (
     <div className="p-6 max-w-3xl mx-auto font-sans">
       <h1 className="text-3xl font-bold mb-4">Úřad pro lidi</h1>
