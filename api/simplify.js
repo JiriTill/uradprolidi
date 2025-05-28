@@ -1,40 +1,51 @@
-import OpenAI from "openai";
+import { OpenAI } from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = new OpenAI();
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+export async function POST(request) {
+  const { content } = await request.json();
 
-  const input = req.body.input;
+  const prompt = `Zjednoduš a srozumitelně shrň následující oficiální dokument. Výstup rozděl do těchto přehledných částí:
 
-  if (!input || input.trim() === "") {
-    return res.status(400).json({ error: "No input provided" });
-  }
+1. Odesílatel: Kdo dopis poslal (instituce a jméno, pokud je uvedeno).
+2. Vyřizuje: Kdo záležitost konkrétně řeší – úředník, který je uveden jako kontaktní osoba pro řešení věci. Pozor, ne vždy je totožný s podepsanou osobou. V případě rozdílu napiš obě jména, ale zvýrazni, že „vyřizuje“ znamená, na koho se má adresát obracet.
+3. Číslo jednací (č.j.): Uveď, pokud je obsaženo. Připiš poznámku: „Tímto číslem lze dopis identifikovat.“
+4. Spisová značka (sp. zn.): Uveď, pokud je v dopise.
+5. Adresát: Komu je dopis určen (jméno nebo název instituce).
 
-  const prompt = `
-Zjednoduš následující text napsaný úředním jazykem tak, aby mu porozuměl běžný člověk bez právního vzdělání. 
-Vysvětli, co chce úřad sdělit, co od člověka očekává a případně jak má postupovat. Piš česky, jednoduše a srozumitelně:
+6. Shrnutí obsahu dopisu jednoduchou češtinou:
+   - O co se jedná?
+   - Co se po mně chce?
+   - Do kdy to mám udělat? (Pokud je uvedeno.)
+   - Jak to mám udělat?
 
-TEXT:
+Vysvětli výstižně, krátce, bez úřednických frází. Napiš to tak, aby tomu rozuměl běžný člověk.
+
+Poznámka ke zkratkám:
+- Č.j. = číslo jednací (slouží k identifikaci dokumentu)
+- Sp. zn. = spisová značka (slouží k určení spisu)
+- „Vyřizuje“ označuje osobu, na kterou se má adresát obracet.
+
+Nyní následuje obsah dopisu:
+
 """
-${input}
+${content}
 """`;
 
-  try {
-    const chatCompletion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7
-    });
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.7,
+  });
 
-    const output = chatCompletion.choices[0].message.content;
-    res.status(200).json({ output });
-  } catch (error) {
-    console.error("Chyba při volání OpenAI:", error);
-    res.status(500).json({ error: "Chyba při komunikaci s OpenAI." });
-  }
+  return new Response(JSON.stringify({ result: response.choices[0].message.content }), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }
