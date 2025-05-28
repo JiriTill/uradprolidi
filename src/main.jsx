@@ -35,27 +35,31 @@ function App() {
     reader.readAsArrayBuffer(file);
   };
 
- const handleSubmit = async () => {
-  const combinedText = pdfText || inputText;
+  const handleSubmit = async () => {
+    const combinedText = pdfText || inputText;
 
-  if (!combinedText.trim()) {
-    alert("Zadejte text nebo nahrajte PDF.");
-    return;
-  }
+    if (!combinedText.trim()) {
+      alert("Zadejte text nebo nahrajte PDF.");
+      return;
+    }
 
-  setOutput("Překládám...");
+    setOutput("Překládám...");
 
-  try {
-    const response = await fetch("/api/simplify", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ input: combinedText }),
-});
+    try {
+      const response = await fetch("/api/simplify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input: combinedText }),
+      });
 
-    const data = await response.json();
-setOutput(data.output || "⚠️ Chyba při zpracování.");
+      const data = await response.json();
+      setOutput(data.output || "⚠️ Chyba při zpracování.");
+    } catch (error) {
+      setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
+    }
+  };
 
   return (
     <div className="p-6 max-w-3xl mx-auto font-sans">
