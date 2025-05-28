@@ -7,33 +7,34 @@ function App() {
   const [pdfText, setPdfText] = useState('');
 
   const handlePDFUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file || !file.type.includes('pdf')) return;
+  const file = event.target.files[0];
+  if (!file || !file.type.includes('pdf')) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const pdfjsLib = await import('pdfjs-dist/build/pdf');
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const pdfjsLib = await import('pdfjs-dist/build/pdf');
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-        const pdf = await loadingTask.promise;
-        let fullText = '';
+      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+      const pdf = await loadingTask.promise;
+      let fullText = '';
 
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const content = await page.getTextContent();
-          fullText += content.items.map((item) => item.str).join(' ') + '\n';
-        }
-
-        setPdfText(fullText);
-      } catch (error) {
-        alert('Chyba při čtení PDF');
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+        fullText += content.items.map((item) => item.str).join(' ') + '\n';
       }
-    };
-    reader.readAsArrayBuffer(file);
+
+      setPdfText(fullText);
+    } catch (error) {
+      console.error("Chyba při zpracování PDF:", error); // ← sem
+      alert('⚠️ Chyba při čtení PDF souboru.');
+    }
   };
+  reader.readAsArrayBuffer(file);
+};
 
   const handleSubmit = async () => {
     const combinedText = pdfText || inputText;
