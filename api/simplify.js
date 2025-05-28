@@ -3,9 +3,10 @@ import { OpenAI } from "openai";
 const openai = new OpenAI();
 
 export async function POST(request) {
-  const { content } = await request.json();
+  const { content, input } = await request.json();
+  const text = content || input;
 
-  if (!content || typeof content !== "string" || content.trim().length === 0) {
+  if (!text || typeof text !== "string" || text.trim().length === 0) {
     return new Response(
       JSON.stringify({ error: "Vstupní text je prázdný nebo neplatný." }),
       { status: 400, headers: { "Content-Type": "application/json" } }
@@ -36,18 +37,13 @@ Poznámka ke zkratkám:
 Nyní následuje obsah dopisu:
 
 """
-${content}
+${text}
 """`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4-1106-preview", // Případně změnit na gpt-3.5-turbo-0125
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      model: "gpt-4-1106-preview",
+      messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
 
@@ -58,32 +54,23 @@ ${content}
     }
 
     return new Response(JSON.stringify({ result }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("OpenAI error:", error);
 
-    // Fallback při chybě: použij jednoduchý prompt
+    // Fallback s jednodušším modelem
     try {
       const fallbackResponse = await openai.chat.completions.create({
         model: "gpt-3.5-turbo-0125",
-        messages: [
-          {
-            role: "user",
-            content: fallbackPrompt,
-          },
-        ],
+        messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
       });
 
       const fallbackResult = fallbackResponse.choices?.[0]?.message?.content || "Nepodařilo se zpracovat.";
 
       return new Response(JSON.stringify({ result: fallbackResult }), {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
     } catch (fallbackError) {
       console.error("Fallback error:", fallbackError);
