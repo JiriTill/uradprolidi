@@ -5,23 +5,13 @@ const openai = new OpenAI();
 export async function POST(request) {
   const { content } = await request.json();
 
-  // Fallback: zkrácení obsahu, pokud je příliš dlouhý
-  const trimmedContent = content.length > 3000 ? content.slice(0, 3000) : content;
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    return new Response(
+      JSON.stringify({ error: "Vstupní text je prázdný nebo neplatný." }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
 
-  // Zjednodušený fallback prompt
-  const fallbackPrompt = `Zjednoduš tento text pro běžného občana:
-
-"""
-${trimmedContent}
-"""
-
-Shrň:
-- O co se jedná?
-- Co se po adresátovi chce?
-- Kdy a jak to má udělat?
-Napiš to jednoduše.`;
-
-  // Hlavní prompt se strukturou
   const prompt = `Zjednoduš a srozumitelně shrň následující oficiální dokument. Výstup rozděl do těchto přehledných částí:
 
 1. Odesílatel: Kdo dopis poslal (instituce a jméno, pokud je uvedeno).
@@ -46,7 +36,7 @@ Poznámka ke zkratkám:
 Nyní následuje obsah dopisu:
 
 """
-${trimmedContent}
+${content}
 """`;
 
   try {
