@@ -45,7 +45,7 @@ function App() {
     <div className="p-6 max-w-3xl mx-auto font-sans">
       <h1 className="text-3xl font-bold mb-4">Úřad pro lidi</h1>
       <p className="mb-6 text-gray-700">
-        Vítejte v našem skromném úřadu, kde mluvíme jazykem smrtelníků. Zkuste to. Přeložíme úředničtinu do člověčiny.
+        Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
       </p>
 
       <textarea
