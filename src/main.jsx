@@ -62,52 +62,67 @@ function App() {
     }
   };
 
-  return (
-    <div className="p-6 max-w-3xl mx-auto font-sans">
-      <h1 className="text-3xl font-bold mb-4">Úřad pro lidi</h1>
-      <p className="mb-6 text-gray-700">
-        Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
-      </p>
-
-      <textarea
-        placeholder="Sem vložte text z úřadu..."
-        className="w-full p-4 border border-gray-300 rounded mb-4"
-        rows={6}
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-      />
-
-      <input
-        type="file"
-        accept=".pdf"
-        onChange={handlePDFUpload}
-        className="mb-4"
-      />
-
-      <div className="mb-4 text-sm text-gray-600">
-        <label className="block mb-1">
-          <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
-        </label>
-        <label className="block">
-          <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
-        </label>
+  const renderStructuredOutput = () => {
+    const sections = output.split(/(?=\d+\. )/g);
+    return sections.map((section, index) => (
+      <div key={index} className="bg-white border rounded shadow p-4 mb-4">
+        <p className="whitespace-pre-wrap text-gray-800">{section.trim()}</p>
       </div>
+    ));
+  };
 
-      <button
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-        onClick={handleSubmit}
-      >
-        Přelož do člověčiny
-      </button>
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 font-sans">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-4xl font-bold mb-4 text-gray-900">Úřad pro lidi</h1>
+        <p className="mb-6 text-gray-700">
+          Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
+        </p>
 
-      {output && (
-        <div className="mt-6 p-4 border border-gray-200 rounded bg-gray-50 whitespace-pre-wrap">
-          <h2 className="font-semibold mb-2">Výstup:</h2>
-          {output}
+        <textarea
+          placeholder="Sem vložte text z úřadu..."
+          className="w-full p-4 border border-gray-300 rounded mb-4 bg-white shadow"
+          rows={6}
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+        />
+
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={handlePDFUpload}
+          className="mb-4"
+        />
+
+        <div className="mb-4 text-sm text-gray-600">
+          <label className="block mb-1">
+            <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
+          </label>
+          <label className="block">
+            <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
+          </label>
         </div>
-      )}
+
+        <button
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition mb-6 shadow"
+          onClick={handleSubmit}
+        >
+          Přelož do člověčiny
+        </button>
+
+        {output && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
+            {renderStructuredOutput()}
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
