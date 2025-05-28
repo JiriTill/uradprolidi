@@ -68,23 +68,14 @@ function App() {
       const trimmed = section.trim();
 
       if (trimmed.startsWith("6.")) {
-        const subParts = trimmed.replace(/^6\.\s*/, "").split(/(?=[A-ZÁ-Ž])/);
-        const title = "Shrnutí obsahu dopisu jednoduchou češtinou:";
-        const boxTitles = [
-          "O co se jedná?",
-          "Co se po mně chce?",
-          "Do kdy to mám udělat?",
-          "Jak to mám udělat?"
-        ];
-
+        const parts = trimmed.split(/- /g).map(p => p.trim()).filter(Boolean);
         return (
           <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <div className="space-y-4">
-              {subParts.map((part, i) => (
+            <h3 className="text-lg font-semibold mb-2">6. Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
+            <div className="space-y-2">
+              {parts.map((part, i) => (
                 <div key={i} className="bg-gray-50 border rounded p-3">
-                  <h4 className="font-semibold text-gray-700 mb-1">{boxTitles[i] || `Část ${i + 1}`}</h4>
-                  <p className="text-gray-800 whitespace-pre-wrap">{part.trim()}</p>
+                  <p className="text-gray-800 whitespace-pre-wrap">{part}</p>
                 </div>
               ))}
             </div>
@@ -94,7 +85,7 @@ function App() {
 
       return (
         <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-          <p className="whitespace-pre-wrap text-gray-800">{trimmed.replace(/^\d+\.\s*/, '')}</p>
+          <p className="whitespace-pre-wrap text-gray-800">{trimmed}</p>
         </div>
       );
     });
