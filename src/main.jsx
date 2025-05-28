@@ -50,7 +50,7 @@ function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_OPENAI_KEY}`,
+        Authorization: `Bearer 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`,
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
