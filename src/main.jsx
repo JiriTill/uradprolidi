@@ -62,48 +62,54 @@ function App() {
     }
   };
 
-const renderStructuredOutput = () => {
-  if (!output) return null;
+  const renderStructuredOutput = () => {
+    if (!output) return null;
 
-  // Rozdělení hlavních sekcí podle číslování
-  const sections = output.split(/(?=\d+\.\s)/g);
+    const sections = output.split(/(?=\d+\.\s)/g);
 
-  return sections.map((section, index) => {
-    const trimmed = section.trim();
+    return sections.map((section, index) => {
+      const trimmed = section.trim();
 
-    // Detekuj "shrnutí obsahu"
-    if (trimmed.toLowerCase().startsWith("6.")) {
-      const content = trimmed.replace(/^6\.\s*Shrnutí obsahu dopisu jednoduchou češtinou:\s*/i, "");
+      if (trimmed.toLowerCase().startsWith("6.")) {
+        const content = trimmed.replace(/^6\.\s*Shrnutí obsahu dopisu jednoduchou češtinou:\s*/i, "");
 
-      const aMatch = content.match(/O co se jedná\??(.*?)(?=Co se po mně chce\?|$)/s);
-      const bMatch = content.match(/Co se po mně chce\??(.*?)(?=Do kdy to mám udělat\?|$)/s);
-      const cMatch = content.match(/Do kdy to mám udělat\??(.*?)(?=Jak to mám udělat\?|$)/s);
-      const dMatch = content.match(/Jak to mám udělat\??(.*)/s);
+        const aMatch = content.match(/O co se jedná\??(.*?)(?=Co se po mně chce\?|$)/s);
+        const bMatch = content.match(/Co se po mně chce\??(.*?)(?=Do kdy to mám udělat\?|$)/s);
+        const cMatch = content.match(/Do kdy to mám udělat\??(.*?)(?=Jak to mám udělat\?|$)/s);
+        const dMatch = content.match(/Jak to mám udělat\??(.*)/s);
 
-      const parts = [
-        { title: "a) O co se jedná?", text: aMatch?.[1]?.trim() },
-        { title: "b) Co se po mně chce?", text: bMatch?.[1]?.trim() },
-        { title: "c) Do kdy to mám udělat?", text: cMatch?.[1]?.trim() },
-        { title: "d) Jak to mám udělat?", text: dMatch?.[1]?.trim() },
-      ];
+        const parts = [
+          { title: "a) O co se jedná?", text: aMatch?.[1]?.trim() },
+          { title: "b) Co se po mně chce?", text: bMatch?.[1]?.trim() },
+          { title: "c) Do kdy to mám udělat?", text: cMatch?.[1]?.trim() },
+          { title: "d) Jak to mám udělat?", text: dMatch?.[1]?.trim() },
+        ];
+
+        return (
+          <div key={index} className="bg-white border rounded shadow p-4 mb-4">
+            <h3 className="text-lg font-semibold mb-4">Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
+            <div className="space-y-4">
+              {parts.map(
+                (part, i) =>
+                  part.text && (
+                    <div key={i} className="bg-gray-50 border rounded p-3">
+                      <h4 className="font-semibold text-gray-700 mb-1">{part.title}</h4>
+                      <p className="text-gray-800 whitespace-pre-wrap">{part.text}</p>
+                    </div>
+                  )
+              )}
+            </div>
+          </div>
+        );
+      }
 
       return (
         <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-          <h3 className="text-lg font-semibold mb-4">Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
-          <div className="space-y-4">
-            {parts.map(
-              (part, i) =>
-                part.text && (
-                  <div key={i} className="bg-gray-50 border rounded p-3">
-                    <h4 className="font-semibold text-gray-700 mb-1">{part.title}</h4>
-                    <p className="text-gray-800 whitespace-pre-wrap">{part.text}</p>
-                  </div>
-                )
-            )}
-          </div>
+          <p className="whitespace-pre-wrap text-gray-800">{trimmed.replace(/^\d+\.\s*/, '')}</p>
         </div>
       );
-    }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 font-sans">
@@ -156,4 +162,3 @@ const renderStructuredOutput = () => {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-
