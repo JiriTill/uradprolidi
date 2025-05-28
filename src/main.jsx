@@ -35,11 +35,52 @@ function App() {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleSubmit = () => {
-    const combinedText = pdfText || inputText;
-    // Simulated response
-    setOutput(`(Zjednodušený překlad bude zde)\n\n${combinedText}`);
-  };
+ const handleSubmit = async () => {
+  const combinedText = pdfText || inputText;
+
+  if (!combinedText.trim()) {
+    alert("Zadejte text nebo nahrajte PDF.");
+    return;
+  }
+
+  setOutput("Překládám...");
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_OPENAI_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Jsi pomocník, který překládá úřednickou řeč do jednoduché a srozumitelné češtiny pro běžné občany.",
+          },
+          {
+            role: "user",
+            content: `Přelož do srozumitelné češtiny:\n\n${combinedText}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 1024,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.choices && data.choices[0]) {
+      setOutput(data.choices[0].message.content.trim());
+    } else {
+      throw new Error("Neplatná odpověď od OpenAI.");
+    }
+  } catch (error) {
+    console.error("Chyba při volání OpenAI:", error);
+    setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
+  }
+};
 
   return (
     <div className="p-6 max-w-3xl mx-auto font-sans">
