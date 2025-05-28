@@ -62,84 +62,57 @@ function App() {
     }
   };
 
-  const renderStructuredOutput = () => {
-    const sections = output.split(/(?=\d+\. )/g);
-    return sections.map((section, index) => {
-      const trimmed = section.trim();
+const renderStructuredOutput = () => {
+  if (!output) return null;
 
-      if (trimmed.startsWith("6.")) {
-        const parts = trimmed.split(/- /g).map(p => p.trim()).filter(Boolean);
-        return (
-          <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-            <h3 className="text-lg font-semibold mb-2">6. Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
-            <div className="space-y-2">
-              {parts.map((part, i) => (
-                <div key={i} className="bg-gray-50 border rounded p-3">
-                  <p className="text-gray-800 whitespace-pre-wrap">{part}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
+  // Rozdělení hlavních sekcí podle číslování
+  const sections = output.split(/(?=\d+\.\s)/g);
+
+  return sections.map((section, index) => {
+    const trimmed = section.trim();
+
+    // Detekuj "shrnutí obsahu"
+    if (trimmed.toLowerCase().startsWith("6.")) {
+      const content = trimmed.replace(/^6\.\s*Shrnutí obsahu dopisu jednoduchou češtinou:\s*/i, "");
+
+      const aMatch = content.match(/O co se jedná\??(.*?)(?=Co se po mně chce\?|$)/s);
+      const bMatch = content.match(/Co se po mně chce\??(.*?)(?=Do kdy to mám udělat\?|$)/s);
+      const cMatch = content.match(/Do kdy to mám udělat\??(.*?)(?=Jak to mám udělat\?|$)/s);
+      const dMatch = content.match(/Jak to mám udělat\??(.*)/s);
+
+      const parts = [
+        { title: "a) O co se jedná?", text: aMatch?.[1]?.trim() },
+        { title: "b) Co se po mně chce?", text: bMatch?.[1]?.trim() },
+        { title: "c) Do kdy to mám udělat?", text: cMatch?.[1]?.trim() },
+        { title: "d) Jak to mám udělat?", text: dMatch?.[1]?.trim() },
+      ];
 
       return (
         <div key={index} className="bg-white border rounded shadow p-4 mb-4">
-          <p className="whitespace-pre-wrap text-gray-800">{trimmed}</p>
+          <h3 className="text-lg font-semibold mb-4">Shrnutí obsahu dopisu jednoduchou češtinou:</h3>
+          <div className="space-y-4">
+            {parts.map(
+              (part, i) =>
+                part.text && (
+                  <div key={i} className="bg-gray-50 border rounded p-3">
+                    <h4 className="font-semibold text-gray-700 mb-1">{part.title}</h4>
+                    <p className="text-gray-800 whitespace-pre-wrap">{part.text}</p>
+                  </div>
+                )
+            )}
+          </div>
         </div>
       );
-    });
-  };
+    }
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-6 font-sans">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900">Úřad pro lidi</h1>
-        <p className="mb-6 text-gray-700">
-          Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
-        </p>
-
-        <textarea
-          placeholder="Sem vložte text z úřadu..."
-          className="w-full p-4 border border-gray-300 rounded mb-4 bg-white shadow"
-          rows={6}
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-
-        <input
-          type="file"
-          accept=".pdf"
-          onChange={handlePDFUpload}
-          className="mb-4"
-        />
-
-        <div className="mb-4 text-sm text-gray-600">
-          <label className="block mb-1">
-            <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
-          </label>
-          <label className="block">
-            <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
-          </label>
-        </div>
-
-        <button
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition mb-6 shadow"
-          onClick={handleSubmit}
-        >
-          Přelož do člověčiny
-        </button>
-
-        {output && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
-            {renderStructuredOutput()}
-          </div>
-        )}
+    // Ostatní části bez čísel
+    return (
+      <div key={index} className="bg-white border rounded shadow p-4 mb-4">
+        <p className="whitespace-pre-wrap text-gray-800">{trimmed.replace(/^\d+\.\s*/, '')}</p>
       </div>
-    </div>
-  );
-}
+    );
+  });
+};
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
