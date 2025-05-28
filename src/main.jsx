@@ -1,8 +1,8 @@
-import './style.css';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import './style.css';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -113,22 +113,22 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4 font-sans flex justify-center">
-      <div className="w-full max-w-3xl">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900 text-center">Úřad pro lidi</h1>
-        <p className="mb-6 text-gray-700 text-center">
+    <div className="min-h-screen bg-gray-100 p-6 font-sans flex items-center justify-center">
+      <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
+        <h1 className="text-4xl font-bold mb-2 text-center text-gray-900">Úřad pro lidi</h1>
+        <p className="mb-6 text-center text-gray-700">
           Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
         </p>
 
-        <p className="mb-2 text-gray-700 font-medium">
+        <p className="font-medium text-gray-800 mb-2">
           Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
         </p>
 
-        <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
           <textarea
             placeholder="Sem vložte text z úřadu..."
-            className="flex-1 p-4 border border-gray-300 rounded bg-white shadow mb-4 sm:mb-0"
-            rows={10}
+            className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
+            rows={8}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
           />
@@ -136,11 +136,11 @@ function App() {
             type="file"
             accept=".pdf"
             onChange={handlePDFUpload}
-            className="self-start sm:self-auto"
+            className="self-start"
           />
         </div>
 
-        <div className="mb-6 text-sm text-gray-600 space-y-2">
+        <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
           <label className="block">
             <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
           </label>
@@ -150,14 +150,14 @@ function App() {
         </div>
 
         <button
-          className="bg-blue-600 text-white text-lg px-8 py-3 rounded hover:bg-blue-700 transition mb-10 shadow w-full sm:w-auto"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
           onClick={handleSubmit}
         >
           Přelož do člověčiny
         </button>
 
         {output && (
-          <div>
+          <div className="mt-10">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
             {renderStructuredOutput()}
           </div>
@@ -166,5 +166,7 @@ function App() {
     </div>
   );
 }
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
