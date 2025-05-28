@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
 function App() {
   const [inputText, setInputText] = useState('');
@@ -14,8 +14,8 @@ function App() {
   reader.onload = async () => {
     try {
       const pdfjsLib = await import('pdfjs-dist/build/pdf');
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+      import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+       pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
       const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
       const pdf = await loadingTask.promise;
