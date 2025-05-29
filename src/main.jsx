@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './style.css';
+
+import App from './pages/Home';
+import About from './pages/About';
+import HowItWorks from './pages/HowItWorks';
+import GDPR from './pages/GDPR';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />} />
+      <Route path="/o-projektu" element={<About />} />
+      <Route path="/jak-to-funguje" element={<HowItWorks />} />
+      <Route path="/gdpr" element={<GDPR />} />
+    </Routes>
+  </BrowserRouter>
+);
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
