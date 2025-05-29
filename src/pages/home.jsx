@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import { extractTextFromImage } from './ocrUtils';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -35,21 +36,27 @@ export default function Home() {
     reader.readAsArrayBuffer(file);
   };
   
-    const handleCameraCapture = async () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment'; // otevře zadní kameru na mobilu
-  
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        handlePDFUpload({ target: { files: [file] } }); // znovu použijeme stávající funkci
-      }
+   const handleCameraCapture = async () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment'; // otevře zadní kameru na mobilu
+    
+      input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          try {
+            const text = await extractTextFromImage(file);
+            setPdfText(text); // uložíme OCR výstup jako kdyby to byl PDF text
+          } catch (err) {
+            alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+          }
+        }
+      };
+    
+      input.click();
     };
-  
-    input.click();
-  };
+
 
 
   const handleSubmit = async () => {
