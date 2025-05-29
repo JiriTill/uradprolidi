@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import { recognizeTextFromImage } from '../utils/ocr';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -9,27 +8,6 @@ export default function Home() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
-
-  const handleSubmit = async () => {
-    const finalText = inputText || pdfText;
-    if (!finalText) {
-      alert('⚠️ Nezadal jsi žádný text ani nenahrál dokument.');
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputText: finalText }),
-      });
-      const data = await response.json();
-      setOutput(data.result);
-    } catch (error) {
-      console.error(error);
-      alert('⚠️ Chyba při komunikaci se serverem.');
-    }
-  };
 
   const handlePDFUpload = (event) => {
     const file = event.target.files[0];
@@ -60,13 +38,12 @@ export default function Home() {
       };
       reader.readAsArrayBuffer(file);
     } else if (isImage) {
-      recognizeTextFromImage(file)
-        .then((text) => {
-          setPdfText(text);
-        })
-        .catch(() => {
-          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-        });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Image = reader.result;
+        setInputText(base64Image);
+      };
+      reader.readAsDataURL(file);
     } else {
       alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
     }
@@ -82,12 +59,12 @@ export default function Home() {
     input.addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (file) {
-        try {
-          const text = await recognizeTextFromImage(file);
-          setPdfText(text);
-        } catch (err) {
-          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Image = reader.result;
+          setInputText(base64Image);
+        };
+        reader.readAsDataURL(file);
       } else {
         alert('⚠️ Nebyl vybrán žádný soubor.');
       }
@@ -96,6 +73,33 @@ export default function Home() {
     document.body.appendChild(input);
     input.click();
     document.body.removeChild(input);
+  };
+
+  const handleSubmit = async () => {
+    if (!inputText && !pdfText) {
+      alert('⚠️ Nezadal jsi žádný text ani nenahrál dokument.');
+      return;
+    }
+
+    setOutput('⏳ Probíhá zpracování...');
+
+    try {
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: inputText.startsWith('data:image/') ? 'image' : 'text',
+          content: inputText || pdfText,
+        }),
+      });
+
+      const data = await response.json();
+      setOutput(data.result || '⚠️ Odpověď je prázdná.');
+    } catch (error) {
+      setOutput('⚠️ Došlo k chybě při komunikaci se serverem.');
+    }
   };
 
   const handleClear = () => {
@@ -162,19 +166,19 @@ export default function Home() {
             Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
           </p>
 
-          <p className="font-medium text-gray-800 mb-2">Vyberte jednu z možností pro nahrání dokumentu:</p>
+          <p className="font-medium text-gray-800 mb-2">Vložte text, nebo nahrajte čitelný dokument (PDF nebo fotku):</p>
 
           <div className="flex flex-col gap-4 mb-4">
             <textarea
               placeholder="Sem vložte text z úřadu..."
               className="p-4 border border-gray-300 rounded bg-white shadow resize-none"
               rows={8}
-              value={inputText}
+              value={inputText.startsWith('data:image/') ? '' : inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
 
             <div>
-              <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku dokumentu (.pdf, .jpg, .png):</label>
+              <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku (.pdf, .jpg, .png):</label>
               <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePDFUpload} className="block" />
             </div>
 
