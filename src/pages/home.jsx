@@ -182,7 +182,7 @@ export default function Home() {
         <div className="space-x-4">
           <a href="/o-projektu" className="hover:underline">O projektu</a>
           <a href="/jak-to-funguje" className="hover:underline">Jak to funguje</a>
-          <a href="/gdpr" className="hover:underline">GDPR</a>
+          <a href="/gdpr" className="hover:underline">Zpracování dat</a>
         </div>
         <p className="mt-2">&copy; {new Date().getFullYear()} Úřad pro lidi</p>
       </footer>
