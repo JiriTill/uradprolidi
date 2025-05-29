@@ -159,14 +159,23 @@ const handleSubmit = async () => {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <button
-            className="w-full sm:w-auto flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
+            className="w-full sm:w-auto flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow disabled:opacity-50"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Přelož do člověčiny
+            {loading ? (
+              <div className="flex justify-center items-center gap-2">
+                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                Překládám...
+              </div>
+            ) : (
+              "Přelož do člověčiny"
+            )}
           </button>
           <button
-            className="w-full sm:w-auto flex-1 bg-gray-300 text-gray-800 py-3 rounded-lg text-lg font-semibold hover:bg-gray-400 transition shadow"
+            className="w-full sm:w-auto flex-1 bg-gray-300 text-gray-800 py-3 rounded-lg text-lg font-semibold hover:bg-gray-400 transition shadow disabled:opacity-50"
             onClick={handleClear}
+            disabled={loading}
           >
             Vymazat vše
           </button>
