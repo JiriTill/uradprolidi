@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { extractTextFromImage } from './ocrUtils';
 import Tesseract from 'tesseract.js';
+import { recognizeTextFromImage } from './utils/ocr';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -15,10 +16,11 @@ export default function Home() {
       const file = event.target.files[0];
       if (!file) return;
     
-      const isPDF = file.type.includes('pdf');
-      const reader = new FileReader();
+      const isPDF = file.type === 'application/pdf';
+      const isImage = file.type.startsWith('image/');
     
       if (isPDF) {
+        const reader = new FileReader();
         reader.onload = async () => {
           try {
             const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
@@ -38,22 +40,19 @@ export default function Home() {
           }
         };
         reader.readAsArrayBuffer(file);
-      } else {
-        // 🧠 Zde přidáváme rozpoznávání obrázku pomocí OCR
-        Tesseract.recognize(file, 'ces', {
-          logger: (m) => console.log(m),
-        }).then(({ data: { text } }) => {
-          if (text.trim()) {
+      } else if (isImage) {
+        recognizeTextFromImage(file)
+          .then((text) => {
             setPdfText(text);
-          } else {
-            alert('⚠️ Text na obrázku nebyl rozpoznán. Zkuste to prosím znovu.');
-          }
-        }).catch((err) => {
-          console.error("Chyba při čtení obrázku:", err);
-          alert('⚠️ Chyba při čtení obrázku.');
-        });
+          })
+          .catch((err) => {
+            alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+          });
+      } else {
+        alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
       }
     };
+
 
   
    const handleCameraCapture = async () => {
