@@ -50,9 +50,7 @@ function App() {
     try {
       const response = await fetch("/api/simplify", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: combinedText }),
       });
 
@@ -61,6 +59,12 @@ function App() {
     } catch (err) {
       setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
     }
+  };
+
+  const handleClear = () => {
+    setInputText('');
+    setPdfText('');
+    setOutput('');
   };
 
   const renderStructuredOutput = () => {
@@ -149,12 +153,20 @@ function App() {
           </label>
         </div>
 
-        <button
-          className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
-          onClick={handleSubmit}
-        >
-          Přelož do člověčiny
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <button
+            className="w-full sm:w-auto flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
+            onClick={handleSubmit}
+          >
+            Přelož do člověčiny
+          </button>
+          <button
+            className="w-full sm:w-auto flex-1 bg-gray-300 text-gray-800 py-3 rounded-lg text-lg font-semibold hover:bg-gray-400 transition shadow"
+            onClick={handleClear}
+          >
+            Vymazat vše
+          </button>
+        </div>
 
         {output && (
           <div className="mt-10">
@@ -166,7 +178,5 @@ function App() {
     </div>
   );
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
