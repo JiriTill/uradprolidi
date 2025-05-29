@@ -3,7 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { extractTextFromImage } from './ocrUtils';
 import Tesseract from 'tesseract.js';
-import { recognizeTextFromImage } from './utils/ocr';
+import { recognizeTextFromImage } from '../utils/ocr';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
