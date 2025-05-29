@@ -162,29 +162,7 @@ function App() {
             {renderStructuredOutput()}
           </div>
         )}
-
-        {/* Sekce: O projektu, Jak to funguje, GDPR */}
-        <div id="o-projektu" className="mt-16">
-          <h2 className="text-xl font-bold mb-2">O projektu</h2>
-          <p className="text-gray-700">
-            Tato aplikace překládá úřední jazyk do srozumitelné češtiny. Cílem je pomoci lidem lépe porozumět tomu, co po nich stát chce.
-          </p>
-        </div>
-
-        <div id="jak-funguje" className="mt-10">
-          <h2 className="text-xl font-bold mb-2">Jak to funguje</h2>
-          <p className="text-gray-700">
-            Nahrajete text nebo čitelné PDF a umělá inteligence text převede do jednoduššího jazyka. Výsledek není právní rada.
-          </p>
-        </div>
-
-        <div id="gdpr" className="mt-10 mb-10">
-          <h2 className="text-xl font-bold mb-2">GDPR</h2>
-          <p className="text-gray-700">
-            Aplikace neukládá žádné osobní údaje. Všechny texty se zpracovávají anonymně a nejsou uchovávány.
-          </p>
-        </div>
-
+        
         {/* Patička */}
         <footer className="mt-12 border-t pt-6 text-sm text-gray-600 text-center">
           <p className="mb-2">&copy; {new Date().getFullYear()} Úřad pro lidi</p>
