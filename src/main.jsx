@@ -10,69 +10,57 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [fileUploaded, setFileUploaded] = useState(false);
 
   const handlePDFUpload = (event) => {
-  const file = event.target.files[0];
-  setFileUploaded(false); // reset při každé nové volbě
+    const file = event.target.files[0];
+    if (!file || !file.type.includes('pdf')) return;
 
-  if (!file || !file.type.includes('pdf')) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+        const pdf = await loadingTask.promise;
+        let fullText = '';
 
-  const reader = new FileReader();
-  reader.onload = async () => {
-    try {
-      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-      const pdf = await loadingTask.promise;
-      let fullText = '';
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const content = await page.getTextContent();
+          fullText += content.items.map((item) => item.str).join(' ') + '\n';
+        }
 
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const content = await page.getTextContent();
-        fullText += content.items.map((item) => item.str).join(' ') + '\n';
+        setPdfText(fullText);
+      } catch (error) {
+        console.error("Chyba při zpracování PDF:", error);
+        alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
       }
-
-      setPdfText(fullText);
-      setFileUploaded(true); // ✅ úspěšně nahráno
-    } catch (error) {
-      console.error("Chyba při zpracování PDF:", error);
-      alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
-    }
+    };
+    reader.readAsArrayBuffer(file);
   };
-  reader.readAsArrayBuffer(file);
-};
 
-const handleSubmit = async () => {
-  const combinedText = pdfText || inputText;
+  const handleSubmit = async () => {
+    const combinedText = pdfText || inputText;
 
-  if (!combinedText.trim()) {
-    alert("Zadejte text nebo nahrajte PDF.");
-    return;
-  }
+    if (!combinedText.trim()) {
+      alert("Zadejte text nebo nahrajte PDF.");
+      return;
+    }
 
-  setLoading(true);
-  setOutput("");
+    setOutput("Překládám...");
 
-  try {
-    const response = await fetch("/api/simplify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: combinedText }),
-    });
+    try {
+      const response = await fetch("/api/simplify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input: combinedText }),
+      });
 
-    const data = await response.json();
-    setOutput(data.result || "⚠️ Chyba při zpracování.");
-  } catch (err) {
-    setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleClear = () => {
-    setInputText('');
-    setPdfText('');
-    setOutput('');
+      const data = await response.json();
+      setOutput(data.result || "⚠️ Chyba při zpracování.");
+    } catch (err) {
+      setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
+    }
   };
 
   const renderStructuredOutput = () => {
@@ -136,7 +124,7 @@ const handleSubmit = async () => {
           Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
         </p>
 
-       <div className="flex flex-col md:flex-row gap-4 mb-4 items-start">
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
           <textarea
             placeholder="Sem vložte text z úřadu..."
             className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
@@ -144,17 +132,12 @@ const handleSubmit = async () => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
           />
-          <div className="flex items-center gap-2">
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handlePDFUpload}
-              className="self-start"
-            />
-            {fileUploaded && (
-              <span className="text-green-600 text-lg" title="Soubor nahrán správně">✅</span>
-            )}
-          </div>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handlePDFUpload}
+            className="self-start"
+          />
         </div>
 
         <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
@@ -166,29 +149,12 @@ const handleSubmit = async () => {
           </label>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <button
-            className="w-full sm:w-auto flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow disabled:opacity-50"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="flex justify-center items-center gap-2">
-                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-                Překládám...
-              </div>
-            ) : (
-              "Přelož do člověčiny"
-            )}
-          </button>
-          <button
-            className="w-full sm:w-auto flex-1 bg-gray-300 text-gray-800 py-3 rounded-lg text-lg font-semibold hover:bg-gray-400 transition shadow disabled:opacity-50"
-            onClick={handleClear}
-            disabled={loading}
-          >
-            Vymazat vše
-          </button>
-        </div>
+        <button
+          className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
+          onClick={handleSubmit}
+        >
+          Přelož do člověčiny
+        </button>
 
         {output && (
           <div className="mt-10">
@@ -196,9 +162,42 @@ const handleSubmit = async () => {
             {renderStructuredOutput()}
           </div>
         )}
+
+        {/* Sekce: O projektu, Jak to funguje, GDPR */}
+        <div id="o-projektu" className="mt-16">
+          <h2 className="text-xl font-bold mb-2">O projektu</h2>
+          <p className="text-gray-700">
+            Tato aplikace překládá úřední jazyk do srozumitelné češtiny. Cílem je pomoci lidem lépe porozumět tomu, co po nich stát chce.
+          </p>
+        </div>
+
+        <div id="jak-funguje" className="mt-10">
+          <h2 className="text-xl font-bold mb-2">Jak to funguje</h2>
+          <p className="text-gray-700">
+            Nahrajete text nebo čitelné PDF a umělá inteligence text převede do jednoduššího jazyka. Výsledek není právní rada.
+          </p>
+        </div>
+
+        <div id="gdpr" className="mt-10 mb-10">
+          <h2 className="text-xl font-bold mb-2">GDPR</h2>
+          <p className="text-gray-700">
+            Aplikace neukládá žádné osobní údaje. Všechny texty se zpracovávají anonymně a nejsou uchovávány.
+          </p>
+        </div>
+
+        {/* Patička */}
+        <footer className="mt-12 border-t pt-6 text-sm text-gray-600 text-center">
+          <p className="mb-2">&copy; {new Date().getFullYear()} Úřad pro lidi</p>
+          <div className="flex justify-center gap-6">
+            <a href="#o-projektu" className="hover:underline">O projektu</a>
+            <a href="#jak-funguje" className="hover:underline">Jak to funguje</a>
+            <a href="#gdpr" className="hover:underline">GDPR</a>
+          </div>
+        </footer>
       </div>
     </div>
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
