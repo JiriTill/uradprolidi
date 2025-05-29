@@ -65,9 +65,10 @@ export default async function handler(req, res) {
     if (data?.choices?.[0]?.message?.content) {
       res.status(200).json({ result: data.choices[0].message.content });
     } else {
-      console.error('API odpověď neobsahuje výstup:', data);
+      console.error('📦 Odpověď od OpenAI:', JSON.stringify(data, null, 2));
       res.status(500).json({ result: '⚠️ Chyba ve zpracování odpovědi od OpenAI.' });
     }
+
   } catch (error) {
     console.error('Chyba při komunikaci s OpenAI:', error);
     res.status(500).json({ result: '⚠️ Došlo k chybě při komunikaci s OpenAI.' });
