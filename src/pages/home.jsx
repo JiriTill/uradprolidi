@@ -34,6 +34,23 @@ export default function Home() {
     };
     reader.readAsArrayBuffer(file);
   };
+  
+    const handleCameraCapture = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment'; // otevře zadní kameru na mobilu
+  
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        handlePDFUpload({ target: { files: [file] } }); // znovu použijeme stávající funkci
+      }
+    };
+  
+    input.click();
+  };
+
 
   const handleSubmit = async () => {
     const combinedText = pdfText || inputText;
@@ -129,21 +146,44 @@ export default function Home() {
             Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
           </p>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <textarea
-              placeholder="Sem vložte text z úřadu..."
-              className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
-              rows={8}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-            />
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handlePDFUpload}
-              className="self-start"
-            />
-          </div>
+         <p className="font-medium text-gray-800 mb-2">
+              Vyberte jednu z možností pro nahrání dokumentu:
+            </p>
+            
+            <div className="flex flex-col gap-4 mb-4">
+              {/* Textové pole */}
+              <textarea
+                placeholder="Sem vložte text z úřadu..."
+                className="p-4 border border-gray-300 rounded bg-white shadow resize-none"
+                rows={8}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+              />
+            
+              {/* Nahrání souboru (PDF nebo obrázku) */}
+              <div>
+                <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku dokumentu (.pdf, .jpg, .png):</label>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handlePDFUpload}
+                  className="block"
+                />
+              </div>
+            
+              {/* Focení dokumentu mobilem */}
+              <div>
+                <button
+                  type="button"
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
+                  onClick={handleCameraCapture}
+                >
+                  📷 Vyfotit dokument mobilem
+                </button>
+                <p className="text-sm text-gray-600 mt-1">Funguje jen na mobilu. Text na fotce musí být dobře čitelný.</p>
+              </div>
+            </div>
+
 
           <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
             <label className="block">
