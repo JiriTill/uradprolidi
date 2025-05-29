@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import { extractTextFromImage } from './ocrUtils';
 import Tesseract from 'tesseract.js';
 import { recognizeTextFromImage } from '../utils/ocr';
 
@@ -13,70 +12,66 @@ export default function Home() {
   const [pdfText, setPdfText] = useState('');
 
   const handlePDFUpload = (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-    
-      const isPDF = file.type === 'application/pdf';
-      const isImage = file.type.startsWith('image/');
-    
-      if (isPDF) {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-            const pdf = await loadingTask.promise;
-            let fullText = '';
-    
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-              const page = await pdf.getPage(pageNum);
-              const content = await page.getTextContent();
-              fullText += content.items.map((item) => item.str).join(' ') + '\n';
-            }
-    
-            setPdfText(fullText);
-          } catch (error) {
-            console.error("Chyba při zpracování PDF:", error);
-            alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const isPDF = file.type === 'application/pdf';
+    const isImage = file.type.startsWith('image/');
+
+    if (isPDF) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+          const pdf = await loadingTask.promise;
+          let fullText = '';
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const content = await page.getTextContent();
+            fullText += content.items.map((item) => item.str).join(' ') + '\n';
           }
-        };
-        reader.readAsArrayBuffer(file);
-      } else if (isImage) {
-        recognizeTextFromImage(file)
-          .then((text) => {
-            setPdfText(text);
-          })
-          .catch((err) => {
-            alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-          });
-      } else {
-        alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
+
+          setPdfText(fullText);
+        } catch (error) {
+          console.error("Chyba při zpracování PDF:", error);
+          alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else if (isImage) {
+      recognizeTextFromImage(file)
+        .then((text) => {
+          setPdfText(text);
+        })
+        .catch((err) => {
+          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+        });
+    } else {
+      alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          const text = await recognizeTextFromImage(file);
+          setPdfText(text);
+        } catch (err) {
+          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+        }
       }
     };
 
-
-  
-   const handleCameraCapture = async () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'environment'; // otevře zadní kameru na mobilu
-    
-      input.onchange = async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          try {
-            const text = await extractTextFromImage(file);
-            setPdfText(text); // uložíme OCR výstup jako kdyby to byl PDF text
-          } catch (err) {
-            alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-          }
-        }
-      };
-    
-      input.click();
-    };
-
-
+    input.click();
+  };
 
   const handleSubmit = async () => {
     const combinedText = pdfText || inputText;
@@ -172,44 +167,40 @@ export default function Home() {
             Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
           </p>
 
-         <p className="font-medium text-gray-800 mb-2">
-              Vyberte jednu z možností pro nahrání dokumentu:
-            </p>
-            
-            <div className="flex flex-col gap-4 mb-4">
-              {/* Textové pole */}
-              <textarea
-                placeholder="Sem vložte text z úřadu..."
-                className="p-4 border border-gray-300 rounded bg-white shadow resize-none"
-                rows={8}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+          <p className="font-medium text-gray-800 mb-2">
+            Vyberte jednu z možností pro nahrání dokumentu:
+          </p>
+
+          <div className="flex flex-col gap-4 mb-4">
+            <textarea
+              placeholder="Sem vložte text z úřadu..."
+              className="p-4 border border-gray-300 rounded bg-white shadow resize-none"
+              rows={8}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku dokumentu (.pdf, .jpg, .png):</label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handlePDFUpload}
+                className="block"
               />
-            
-              {/* Nahrání souboru (PDF nebo obrázku) */}
-              <div>
-                <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku dokumentu (.pdf, .jpg, .png):</label>
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handlePDFUpload}
-                  className="block"
-                />
-              </div>
-            
-              {/* Focení dokumentu mobilem */}
-              <div>
-                <button
-                  type="button"
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
-                  onClick={handleCameraCapture}
-                >
-                  📷 Vyfotit dokument mobilem
-                </button>
-                <p className="text-sm text-gray-600 mt-1">Funguje jen na mobilu. Text na fotce musí být dobře čitelný.</p>
-              </div>
             </div>
 
+            <div>
+              <button
+                type="button"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
+                onClick={handleCameraCapture}
+              >
+                📷 Vyfotit dokument mobilem
+              </button>
+              <p className="text-sm text-gray-600 mt-1">Funguje jen na mobilu. Text na fotce musí být dobře čitelný.</p>
+            </div>
+          </div>
 
           <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
             <label className="block">
