@@ -61,6 +61,12 @@ export default function Home() {
     }
   };
 
+  const handleClear = () => {
+    setInputText('');
+    setOutput('');
+    setPdfText('');
+  };
+
   const renderStructuredOutput = () => {
     if (!output) return null;
 
@@ -111,57 +117,75 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 font-sans flex items-center justify-center">
-      <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-4xl font-bold mb-2 text-center text-gray-900">Úřad pro lidi</h1>
-        <p className="mb-6 text-center text-gray-700">
-          Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
-        </p>
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-between">
+      <main className="p-6 font-sans flex-grow flex items-center justify-center">
+        <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
+          <h1 className="text-4xl font-bold mb-2 text-center text-gray-900">Úřad pro lidi</h1>
+          <p className="mb-6 text-center text-gray-700">
+            Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
+          </p>
 
-        <p className="font-medium text-gray-800 mb-2">
-          Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
-        </p>
+          <p className="font-medium text-gray-800 mb-2">
+            Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
+          </p>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <textarea
-            placeholder="Sem vložte text z úřadu..."
-            className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
-            rows={8}
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-          />
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handlePDFUpload}
-            className="self-start"
-          />
-        </div>
-
-        <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
-          <label className="block">
-            <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
-          </label>
-          <label className="block">
-            <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
-          </label>
-        </div>
-
-        <button
-          className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
-          onClick={handleSubmit}
-        >
-          Přelož do člověčiny
-        </button>
-
-        {output && (
-          <div className="mt-10">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
-            {renderStructuredOutput()}
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <textarea
+              placeholder="Sem vložte text z úřadu..."
+              className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
+              rows={8}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handlePDFUpload}
+              className="self-start"
+            />
           </div>
-        )}
-      </div>
+
+          <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
+            <label className="block">
+              <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
+            </label>
+            <label className="block">
+              <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
+            </label>
+          </div>
+
+          <div className="flex gap-4 mb-4">
+            <button
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
+              onClick={handleSubmit}
+            >
+              Přelož do člověčiny
+            </button>
+            <button
+              className="flex-1 bg-gray-300 text-gray-800 py-3 rounded-lg text-lg font-semibold hover:bg-gray-400 transition shadow"
+              onClick={handleClear}
+            >
+              Vymazat vše
+            </button>
+          </div>
+
+          {output && (
+            <div className="mt-10">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
+              {renderStructuredOutput()}
+            </div>
+          )}
+        </div>
+      </main>
+
+      <footer className="text-center text-sm text-gray-500 py-4">
+        <div className="space-x-4">
+          <a href="/o-projektu" className="hover:underline">O projektu</a>
+          <a href="/jak-to-funguje" className="hover:underline">Jak to funguje</a>
+          <a href="/gdpr" className="hover:underline">GDPR</a>
+        </div>
+        <p className="mt-2">&copy; {new Date().getFullYear()} Úřad pro lidi</p>
+      </footer>
     </div>
   );
 }
-
