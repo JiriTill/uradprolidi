@@ -11,32 +11,36 @@ function App() {
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fileUploaded, setFileUploaded] = useState(false);
 
   const handlePDFUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file || !file.type.includes('pdf')) return;
+  const file = event.target.files[0];
+  setFileUploaded(false); // reset při každé nové volbě
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-        const pdf = await loadingTask.promise;
-        let fullText = '';
+  if (!file || !file.type.includes('pdf')) return;
 
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const content = await page.getTextContent();
-          fullText += content.items.map((item) => item.str).join(' ') + '\n';
-        }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+      const pdf = await loadingTask.promise;
+      let fullText = '';
 
-        setPdfText(fullText);
-      } catch (error) {
-        console.error("Chyba při zpracování PDF:", error);
-        alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+        fullText += content.items.map((item) => item.str).join(' ') + '\n';
       }
-    };
-    reader.readAsArrayBuffer(file);
+
+      setPdfText(fullText);
+      setFileUploaded(true); // ✅ úspěšně nahráno
+    } catch (error) {
+      console.error("Chyba při zpracování PDF:", error);
+      alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+    }
   };
+  reader.readAsArrayBuffer(file);
+};
 
 const handleSubmit = async () => {
   const combinedText = pdfText || inputText;
@@ -132,7 +136,7 @@ const handleSubmit = async () => {
           Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
         </p>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
+       <div className="flex flex-col md:flex-row gap-4 mb-4 items-start">
           <textarea
             placeholder="Sem vložte text z úřadu..."
             className="flex-1 p-4 border border-gray-300 rounded bg-white shadow resize-none"
@@ -140,12 +144,17 @@ const handleSubmit = async () => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
           />
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handlePDFUpload}
-            className="self-start"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handlePDFUpload}
+              className="self-start"
+            />
+            {fileUploaded && (
+              <span className="text-green-600 text-lg" title="Soubor nahrán správně">✅</span>
+            )}
+          </div>
         </div>
 
         <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
