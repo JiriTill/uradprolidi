@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { extractTextFromImage } from './ocrUtils';
+import Tesseract from 'tesseract.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -11,30 +12,49 @@ export default function Home() {
   const [pdfText, setPdfText] = useState('');
 
   const handlePDFUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file || !file.type.includes('pdf')) return;
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-        const pdf = await loadingTask.promise;
-        let fullText = '';
-
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const content = await page.getTextContent();
-          fullText += content.items.map((item) => item.str).join(' ') + '\n';
-        }
-
-        setPdfText(fullText);
-      } catch (error) {
-        console.error("Chyba při zpracování PDF:", error);
-        alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+      const file = event.target.files[0];
+      if (!file) return;
+    
+      const isPDF = file.type.includes('pdf');
+      const reader = new FileReader();
+    
+      if (isPDF) {
+        reader.onload = async () => {
+          try {
+            const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+            const pdf = await loadingTask.promise;
+            let fullText = '';
+    
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const content = await page.getTextContent();
+              fullText += content.items.map((item) => item.str).join(' ') + '\n';
+            }
+    
+            setPdfText(fullText);
+          } catch (error) {
+            console.error("Chyba při zpracování PDF:", error);
+            alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // 🧠 Zde přidáváme rozpoznávání obrázku pomocí OCR
+        Tesseract.recognize(file, 'ces', {
+          logger: (m) => console.log(m),
+        }).then(({ data: { text } }) => {
+          if (text.trim()) {
+            setPdfText(text);
+          } else {
+            alert('⚠️ Text na obrázku nebyl rozpoznán. Zkuste to prosím znovu.');
+          }
+        }).catch((err) => {
+          console.error("Chyba při čtení obrázku:", err);
+          alert('⚠️ Chyba při čtení obrázku.');
+        });
       }
     };
-    reader.readAsArrayBuffer(file);
-  };
+
   
    const handleCameraCapture = async () => {
       const input = document.createElement('input');
