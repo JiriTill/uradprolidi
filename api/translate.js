@@ -14,25 +14,26 @@ export default async function handler(req, res) {
   try {
     let messages = [];
 
-    if (type === 'image') {
-      messages = [
+   if (type === 'image') {
+  messages = [
+    {
+      role: 'system',
+      content:
+        'Jsi překladač dokumentů pro veřejnost. Přelož úřední jazyk z obrázku do jednoduché češtiny. Strukturovaně rozděl výstup na části: O co se jedná, Co se po mně chce, Do kdy to mám udělat, Jak to mám udělat. Používej srozumitelný jazyk pro běžné lidi.',
+    },
+    {
+      role: 'user',
+      content: [
         {
-          role: 'system',
-          content:
-            'Jsi překladač dokumentů pro veřejnost. Uživateli přelož úřední dokument na obrázku (fotce) do jednoduché češtiny. Výstup rozděl strukturovaně do bodů podle toho, co je důležité. Nejde o OCR, ale rovnou o výklad a shrnutí obrázku s textem.',
+          type: 'image_url',
+          image_url: {
+            url: content,
+          },
         },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: content,
-              },
-            },
-          ],
-        },
-      ];
+      ],
+    },
+  ];
+     
     } else {
       messages = [
         {
