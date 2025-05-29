@@ -52,52 +52,32 @@ export default function Home() {
     }
   };
 
-  const handleCameraCapture = async () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
+      const handleCameraCapture = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        input.style.display = 'none';
+      
+        input.addEventListener('change', async (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            try {
+              const text = await recognizeTextFromImage(file);
+              setPdfText(text);
+            } catch (err) {
+              alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+            }
+          } else {
+            alert('⚠️ Nebyl vybrán žádný soubor.');
+          }
+        });
+      
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+      };
 
-    input.onchange = async (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        try {
-          const text = await recognizeTextFromImage(file);
-          setPdfText(text);
-        } catch (err) {
-          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-        }
-      }
-    };
-
-    input.click();
-  };
-
-  const handleSubmit = async () => {
-    const combinedText = pdfText || inputText;
-
-    if (!combinedText.trim()) {
-      alert("Zadejte text nebo nahrajte PDF.");
-      return;
-    }
-
-    setOutput("Překládám...");
-
-    try {
-      const response = await fetch("/api/simplify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ input: combinedText }),
-      });
-
-      const data = await response.json();
-      setOutput(data.result || "⚠️ Chyba při zpracování.");
-    } catch (err) {
-      setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
-    }
-  };
 
   const handleClear = () => {
     setInputText('');
