@@ -10,6 +10,7 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handlePDFUpload = (event) => {
     const file = event.target.files[0];
@@ -37,29 +38,32 @@ function App() {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleSubmit = async () => {
-    const combinedText = pdfText || inputText;
+const handleSubmit = async () => {
+  const combinedText = pdfText || inputText;
 
-    if (!combinedText.trim()) {
-      alert("Zadejte text nebo nahrajte PDF.");
-      return;
-    }
+  if (!combinedText.trim()) {
+    alert("Zadejte text nebo nahrajte PDF.");
+    return;
+  }
 
-    setOutput("Překládám...");
+  setLoading(true);
+  setOutput("");
 
-    try {
-      const response = await fetch("/api/simplify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: combinedText }),
-      });
+  try {
+    const response = await fetch("/api/simplify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: combinedText }),
+    });
 
-      const data = await response.json();
-      setOutput(data.result || "⚠️ Chyba při zpracování.");
-    } catch (err) {
-      setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
-    }
-  };
+    const data = await response.json();
+    setOutput(data.result || "⚠️ Chyba při zpracování.");
+  } catch (err) {
+    setOutput("⚠️ Došlo k chybě při překladu. Zkuste to prosím znovu.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleClear = () => {
     setInputText('');
