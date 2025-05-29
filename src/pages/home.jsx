@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import Tesseract from 'tesseract.js';
 import { recognizeTextFromImage } from '../utils/ocr';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
@@ -10,6 +9,27 @@ export default function Home() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
+
+  const handleSubmit = async () => {
+    const finalText = inputText || pdfText;
+    if (!finalText) {
+      alert('⚠️ Nezadal jsi žádný text ani nenahrál dokument.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputText: finalText }),
+      });
+      const data = await response.json();
+      setOutput(data.result);
+    } catch (error) {
+      console.error(error);
+      alert('⚠️ Chyba při komunikaci se serverem.');
+    }
+  };
 
   const handlePDFUpload = (event) => {
     const file = event.target.files[0];
@@ -44,7 +64,7 @@ export default function Home() {
         .then((text) => {
           setPdfText(text);
         })
-        .catch((err) => {
+        .catch(() => {
           alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
         });
     } else {
@@ -52,32 +72,31 @@ export default function Home() {
     }
   };
 
-      const handleCameraCapture = () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'environment';
-        input.style.display = 'none';
-      
-        input.addEventListener('change', async (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            try {
-              const text = await recognizeTextFromImage(file);
-              setPdfText(text);
-            } catch (err) {
-              alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
-            }
-          } else {
-            alert('⚠️ Nebyl vybrán žádný soubor.');
-          }
-        });
-      
-        document.body.appendChild(input);
-        input.click();
-        document.body.removeChild(input);
-      };
+  const handleCameraCapture = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.style.display = 'none';
 
+    input.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          const text = await recognizeTextFromImage(file);
+          setPdfText(text);
+        } catch (err) {
+          alert('⚠️ Nepodařilo se rozpoznat text z obrázku.');
+        }
+      } else {
+        alert('⚠️ Nebyl vybrán žádný soubor.');
+      }
+    });
+
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  };
 
   const handleClear = () => {
     setInputText('');
@@ -143,13 +162,7 @@ export default function Home() {
             Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
           </p>
 
-          <p className="font-medium text-gray-800 mb-2">
-            Vložte text nebo nahrajte čitelný PDF soubor (nikoli sken dokumentu):
-          </p>
-
-          <p className="font-medium text-gray-800 mb-2">
-            Vyberte jednu z možností pro nahrání dokumentu:
-          </p>
+          <p className="font-medium text-gray-800 mb-2">Vyberte jednu z možností pro nahrání dokumentu:</p>
 
           <div className="flex flex-col gap-4 mb-4">
             <textarea
@@ -162,12 +175,7 @@ export default function Home() {
 
             <div>
               <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku dokumentu (.pdf, .jpg, .png):</label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handlePDFUpload}
-                className="block"
-              />
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePDFUpload} className="block" />
             </div>
 
             <div>
@@ -226,3 +234,4 @@ export default function Home() {
     </div>
   );
 }
+
