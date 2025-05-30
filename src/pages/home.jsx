@@ -3,8 +3,6 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import Tesseract from 'tesseract.js';
 import FeedbackForm from './components/FeedbackForm';
-...
-<FeedbackForm />
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
