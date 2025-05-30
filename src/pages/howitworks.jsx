@@ -16,9 +16,9 @@ export default function HowItWorks() {
           Můžete:
         </p>
         <ul className="list-disc list-inside mb-4 text-gray-800">
-          <li>vložit text dopisu ručně,</li>
+          <li>vložit text dokumentu ručně,</li>
           <li>nahrát PDF soubor (fungují i skeny!),</li>
-          <li>nahrát fotku dokumentu z mobilu.</li>
+          <li>vyfotit fotku dokumentu přímo z mobilu.</li>
         </ul>
         <p className="mb-4 text-gray-800 leading-relaxed">
           Systém automaticky rozpozná text i ze skenů a obrázků pomocí OCR.
