@@ -16,7 +16,7 @@ export default function About() {
         </p>
 
         <p className="mb-4 text-gray-800 leading-relaxed">
-          <strong>Úřad pro lidi</strong> pomáhá běžným lidem porozumět složitým dopisům, výzvám a dokumentům. Využíváme umělou inteligenci (OpenAI), optické rozpoznávání textu (OCR) a jednoduchý design, abyste se konečně dozvěděli: <em>co se po vás chce, do kdy a jak to udělat</em>.
+          <strong>Úřad pro lidi</strong> pomáhá běžným lidem porozumět složitým dopisům, výzvám a dokumentům. Využívám umělou inteligenci (OpenAI), optické rozpoznávání textu (OCR) a jednoduchý design, abyste se konečně dozvěděli: <em>co se po vás chce, do kdy a jak to udělat</em>.
         </p>
 
         <p className="mb-4 text-gray-800 leading-relaxed">
