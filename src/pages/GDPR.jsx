@@ -26,7 +26,7 @@ export default function GDPR() {
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">✉️ Zpětná vazba</h2>
         <p className="mb-4 text-gray-800 leading-relaxed">
-          Pokud nám pošlete zpětnou vazbu prostřednictvím formuláře, ukládáme ji spolu s informacemi o zařízení a prohlížeči, ze kterého byla odeslána. Tyto informace slouží výhradně k analýze a ke zlepšení aplikace. Nejsou předávány třetím stranám ani využívány k marketingovým účelům.
+          Pokud nám pošlete zpětnou vazbu prostřednictvím formuláře, ukládám ji spolu s informacemi o zařízení a prohlížeči, ze kterého byla odeslána. Tyto informace slouží výhradně k analýze a ke zlepšení aplikace. Nejsou předávány třetím stranám ani využívány k marketingovým účelům.
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">🛡️ Váš souhlas</h2>
@@ -36,7 +36,7 @@ export default function GDPR() {
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">📧 Kontakt na správce</h2>
         <p className="mb-4 text-gray-800 leading-relaxed">
-          V případě dotazů ke zpracování údajů nebo uplatnění vašich práv dle GDPR nás můžete kontaktovat na e-mailové adrese: <a href="mailto:info@uradprolidi.cz" className="text-blue-600 hover:underline">info@uradprolidi.cz</a>
+          V případě dotazů ke zpracování údajů mě kontaktujte prostřednictvím formuláře na stránce <a href="/o-projektu" className="text-blue-600 hover:underline">O projektu</a>.
         </p>
 
         <Link
@@ -45,6 +45,18 @@ export default function GDPR() {
         >
           Zpět k překladu do člověčiny
         </Link>
+
+            <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">🚫 Upozornění na citlivé údaje</h2>
+            <p className="mb-4 text-gray-800 leading-relaxed">
+              Ačkoliv aplikace <strong>Úřad pro lidi</strong> neukládá žádná data a neslouží k ověřování totožnosti, <strong>nedoporučujeme zadávat osobní údaje</strong>, jako je rodné číslo, datum narození, adresa trvalého bydliště nebo jiné citlivé informace.
+            </p>
+            <p className="mb-4 text-gray-800 leading-relaxed">
+              Tyto údaje aplikace <strong>nepotřebuje, nezpracovává a ani nechce zpracovávat</strong>. Pokud se nacházejí na úředním dokumentu, doporučujeme je před nahráním <strong>začernit nebo anonymizovat</strong>.
+            </p>
+            <p className="mb-4 text-gray-800 leading-relaxed">
+              Toto je mé obecné doporučení jako člověka, který se ve veřejné správě dlouhodobě věnuje také bezpečnosti: <strong>osobní údaje nepatří na internet, pokud to není nezbytně nutné.</strong>
+            </p>
+        
       </main>
 
       <footer className="text-center text-sm text-gray-500 py-6 border-t mt-8">
