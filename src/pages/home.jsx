@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import Tesseract from 'tesseract.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -26,47 +27,62 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [loading]);
 
-  const handlePDFUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const isPDF = file.type === 'application/pdf';
-    const isImage = file.type.startsWith('image/');
-
-    if (isPDF) {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
-          const pdf = await loadingTask.promise;
-          let fullText = '';
-
-          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum);
+    const handlePDFUpload = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+    
+      const isPDF = file.type === 'application/pdf';
+      const isImage = file.type.startsWith('image/');
+    
+      if (isPDF) {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(reader.result) });
+            const pdf = await loadingTask.promise;
+            const page = await pdf.getPage(1);
+    
             const content = await page.getTextContent();
-            fullText += content.items.map((item) => item.str).join(' ') + '\n';
+            const fullText = content.items.map((item) => item.str).join(' ').trim();
+    
+            if (fullText.length > 10) {
+              setPdfText(fullText);
+              setUploadSuccess(true);
+              return;
+            }
+    
+            // 🧠 PDF neobsahuje čitelný text – fallback na OCR
+            const viewport = page.getViewport({ scale: 2.0 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+    
+            await page.render({ canvasContext: context, viewport }).promise;
+            const dataUrl = canvas.toDataURL();
+    
+            setUploadSuccess(true);
+            setInputText(dataUrl); // ⬅️ Předáme jako obrázek pro OCR v OpenAI
+    
+          } catch (error) {
+            console.error("Chyba při zpracování PDF:", error);
+            alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
           }
-
-          setPdfText(fullText);
+        };
+        reader.readAsArrayBuffer(file);
+      } else if (isImage) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Image = reader.result;
+          setInputText(base64Image);
           setUploadSuccess(true);
-        } catch (error) {
-          console.error("Chyba při zpracování PDF:", error);
-          alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else if (isImage) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Image = reader.result;
-        setInputText(base64Image);
-        setUploadSuccess(true);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
-    }
-  };
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('⚠️ Podporovány jsou pouze PDF a obrázky.');
+      }
+    };
+
 
   const handleCameraCapture = () => {
     const input = document.createElement('input');
