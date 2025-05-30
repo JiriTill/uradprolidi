@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import FeedbackForm from '../components/FeedbackForm';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -248,6 +249,9 @@ export default function Home() {
             <div className="mt-10">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
               {renderStructuredOutput()}
+          
+              {/* Komponenta pro zpětnou vazbu */}
+              <FeedbackForm />
             </div>
           )}
         </div>
