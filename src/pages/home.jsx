@@ -180,9 +180,9 @@ export default function Home() {
             <p className="mb-2 text-center text-gray-700">
               Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
             </p>
-            <p className="mb-6 text-center text-blue-700 font-medium">
-              Vložte svůj úřední dokument, kterému nerozumíte, a my vám ho přeložíme do srozumitelné řeči a řekneme vám, co po vás úředník vlastně chce.
-            </p>
+           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded text-sm mb-2 shadow">
+              <p><strong>Vložte svůj úřední dokument</strong>, kterému nerozumíte, a my vám ho přeložíme do srozumitelné řeči. Řekneme vám, co po vás úředník vlastně chce.</p>
+            </div>
 
           <p className="font-medium text-gray-800 mb-2">Vložte text, nebo nahrajte čitelný dokument (PDF nebo fotku):</p>
 
