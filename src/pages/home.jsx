@@ -15,6 +15,11 @@ export default function Home() {
   const [gdprChecked, setGdprChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackChoice, setFeedbackChoice] = useState(null); // 'yes' or 'no'
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
 
   useEffect(() => {
     let timer;
@@ -258,12 +263,69 @@ export default function Home() {
             </div>
           )}
 
-          {output && !loading && (
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
-              {renderStructuredOutput()}
-            </div>
-          )}
+         {output && (
+              <div className="mt-10">
+                <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
+                {renderStructuredOutput()}
+            
+                {!feedbackSubmitted && (
+                  <div className="mt-8 bg-gray-100 border rounded p-4">
+                    <p className="text-gray-800 font-medium mb-2">Byl pro vás výstup srozumitelný?</p>
+                    <div className="flex gap-4 mb-3">
+                      <button
+                        className={`py-2 px-4 rounded ${feedbackChoice === 'yes' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                        onClick={() => {
+                          setFeedbackChoice('yes');
+                          setFeedbackVisible(true);
+                        }}
+                      >
+                        Ano 👍
+                      </button>
+                      <button
+                        className={`py-2 px-4 rounded ${feedbackChoice === 'no' ? 'bg-red-600 text-white' : 'bg-gray-200'}`}
+                        onClick={() => {
+                          setFeedbackChoice('no');
+                          setFeedbackVisible(true);
+                        }}
+                      >
+                        Ne 👎
+                      </button>
+                    </div>
+            
+                    {feedbackVisible && (
+                      <>
+                        <textarea
+                          rows={3}
+                          className="w-full p-2 border border-gray-300 rounded mb-2"
+                          placeholder="Chcete něco dodat?"
+                          value={feedbackComment}
+                          onChange={(e) => setFeedbackComment(e.target.value)}
+                        />
+                        <button
+                          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                          onClick={() => {
+                            console.log('Zpětná vazba:', {
+                              choice: feedbackChoice,
+                              comment: feedbackComment,
+                            });
+                            setFeedbackSubmitted(true);
+                          }}
+                        >
+                          Odeslat zpětnou vazbu
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+            
+                {feedbackSubmitted && (
+                  <div className="mt-4 text-green-700 font-semibold">
+                    Děkujeme za vaši zpětnou vazbu! 🙏
+                  </div>
+                )}
+              </div>
+            )}
+
         </div>
       </main>
 
