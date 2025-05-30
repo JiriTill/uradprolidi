@@ -48,10 +48,10 @@ export default function GDPR() {
 
             <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">🚫 Upozornění na citlivé údaje</h2>
             <p className="mb-4 text-gray-800 leading-relaxed">
-              Ačkoliv aplikace <strong>Úřad pro lidi</strong> neukládá žádná data a neslouží k ověřování totožnosti, <strong>nedoporučujeme zadávat osobní údaje</strong>, jako je rodné číslo, datum narození, adresa trvalého bydliště nebo jiné citlivé informace.
+              Ačkoliv aplikace <strong>Úřad pro lidi</strong> neukládá žádná data a neslouží k ověřování totožnosti, <strong>nedoporučuji zadávat osobní údaje</strong>, jako je rodné číslo, datum narození, adresa trvalého bydliště nebo jiné citlivé informace.
             </p>
             <p className="mb-4 text-gray-800 leading-relaxed">
-              Tyto údaje aplikace <strong>nepotřebuje, nezpracovává a ani nechce zpracovávat</strong>. Pokud se nacházejí na úředním dokumentu, doporučujeme je před nahráním <strong>začernit nebo anonymizovat</strong>.
+              Tyto údaje aplikace <strong>nepotřebuje, nezpracovává a ani nechce zpracovávat</strong>. Pokud se nacházejí na úředním dokumentu, doporučuji je před nahráním <strong>začernit nebo anonymizovat</strong>.
             </p>
             <p className="mb-4 text-gray-800 leading-relaxed">
               Toto je mé obecné doporučení jako člověka, který se ve veřejné správě dlouhodobě věnuje také bezpečnosti: <strong>osobní údaje nepatří na internet, pokud to není nezbytně nutné.</strong>
