@@ -24,9 +24,14 @@ export default function GDPR() {
           Úřad pro lidi žádná data <strong>neukládá</strong>, nesleduje uživatele a nepoužívá cookies ani analytické nástroje. Po překladu nejsou soubory ani texty nikde uchovávány — data se okamžitě „zapomenou“.
         </p>
 
+        <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">✉️ Zpětná vazba</h2>
+        <p className="mb-4 text-gray-800 leading-relaxed">
+          Pokud nám pošlete zpětnou vazbu prostřednictvím formuláře, ukládáme ji spolu s informacemi o zařízení a prohlížeči, ze kterého byla odeslána. Tyto informace slouží výhradně k analýze a ke zlepšení aplikace. Nejsou předávány třetím stranám ani využívány k marketingovým účelům.
+        </p>
+
         <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">🛡️ Váš souhlas</h2>
         <p className="mb-4 text-gray-800 leading-relaxed">
-          Použitím této aplikace dáváte souhlas s jednorázovým zpracováním dat výhradně pro účely zjednodušení úředního dokumentu. Tento souhlas je dobrovolný a nezbytný pro fungování aplikace.
+          Použitím této aplikace dáváte souhlas s jednorázovým zpracováním dat výhradně pro účely zjednodušení úředního dokumentu, nebo v případě zpětné vazby pro účely vylepšení služby. Tento souhlas je dobrovolný a nezbytný pro fungování aplikace.
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-gray-900">📧 Kontakt na správce</h2>
