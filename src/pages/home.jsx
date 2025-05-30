@@ -8,6 +8,7 @@ export default function Home() {
   const [inputText, setInputText] = useState('');
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const handlePDFUpload = (event) => {
     const file = event.target.files[0];
@@ -31,6 +32,7 @@ export default function Home() {
           }
 
           setPdfText(fullText);
+          setUploadSuccess(true);
         } catch (error) {
           console.error("Chyba při zpracování PDF:", error);
           alert('⚠️ Chyba při čtení PDF. Ujistěte se, že soubor je čitelný.');
@@ -42,6 +44,7 @@ export default function Home() {
       reader.onloadend = () => {
         const base64Image = reader.result;
         setInputText(base64Image);
+        setUploadSuccess(true);
       };
       reader.readAsDataURL(file);
     } else {
@@ -63,6 +66,7 @@ export default function Home() {
         reader.onloadend = () => {
           const base64Image = reader.result;
           setInputText(base64Image);
+          setUploadSuccess(true);
         };
         reader.readAsDataURL(file);
       } else {
@@ -75,59 +79,59 @@ export default function Home() {
     document.body.removeChild(input);
   };
 
-    const handleSubmit = async () => {
-      if (!inputText && !pdfText) {
-        alert('⚠️ Nezadal jsi žádný text ani nenahrál dokument.');
-        return;
-      }
-    
-      setOutput('⏳ Probíhá zpracování...');
-    
-      try {
-        const isImage = inputText.startsWith('data:image/');
-        const payload = {
-          type: isImage ? 'image' : 'text',
-          content: isImage ? inputText : pdfText || inputText,
-        };
-    
-        const response = await fetch('/api/translate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-    
-        const data = await response.json();
-        setOutput(data.result || '⚠️ Odpověď je prázdná.');
-      } catch (error) {
-        console.error(error);
-        setOutput('⚠️ Došlo k chybě při komunikaci se serverem.');
-      }
-    };
+  const handleSubmit = async () => {
+    if (!inputText && !pdfText) {
+      alert('⚠️ Nezadal jsi žádný text ani nenahrál dokument.');
+      return;
+    }
+
+    setOutput('⏳ Probíhá zpracování...');
+
+    try {
+      const isImage = inputText.startsWith('data:image/');
+      const payload = {
+        type: isImage ? 'image' : 'text',
+        content: isImage ? inputText : pdfText || inputText,
+      };
+
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      setOutput(data.result || '⚠️ Odpověď je prázdná.');
+    } catch (error) {
+      console.error(error);
+      setOutput('⚠️ Došlo k chybě při komunikaci se serverem.');
+    }
+  };
 
   const handleClear = () => {
     setInputText('');
     setOutput('');
     setPdfText('');
+    setUploadSuccess(false);
   };
 
-    const renderStructuredOutput = () => {
-      if (!output) return null;
-    
-      const sections = output.split(/(?=🏛️|👤|🆔|📬|🧾|🟨|📌|📣|📎)/g);
-    
-      return (
-        <div className="bg-white border rounded shadow p-4 mb-4 whitespace-pre-wrap text-gray-800">
-          {sections.map((section, index) => (
-            <div key={index} className="mb-3">
-              {section.trim()}
-            </div>
-          ))}
-        </div>
-      );
-    };
+  const renderStructuredOutput = () => {
+    if (!output) return null;
 
+    const sections = output.split(/(?=🏛️|👤|🆔|📬|🧾|🟨|📌|📣|📎)/g);
+
+    return (
+      <div className="bg-white border rounded shadow p-4 mb-4 whitespace-pre-wrap text-gray-800">
+        {sections.map((section, index) => (
+          <div key={index} className="mb-3">
+            {section.trim()}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-between">
@@ -151,7 +155,17 @@ export default function Home() {
 
             <div>
               <label className="block mb-1 text-gray-700 font-medium">Nahrát PDF nebo fotku (.pdf, .jpg, .png):</label>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePDFUpload} className="block" />
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handlePDFUpload}
+                  className="block"
+                />
+                {uploadSuccess && (
+                  <span className="text-green-600 text-xl" title="Soubor nahrán správně">✅</span>
+                )}
+              </div>
             </div>
 
             <div>
