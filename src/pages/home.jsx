@@ -198,9 +198,104 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-xl font-bold text-center text-red-600">Chybí návratový obsah. Uprav soubor tak, aby obsahoval validní JSX.</h1>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-8">
+      <h1 className="text-3xl font-bold text-center mb-4">Úřad pro lidi</h1>
+      <textarea
+        className="w-full max-w-xl p-3 border rounded mb-4"
+        rows={5}
+        placeholder="Zde vložte text nebo nahrajte dokument."
+        value={inputText.startsWith('data:image/') ? '' : inputText}
+        onChange={(e) => setInputText(e.target.value)}
+      />
+
+      <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePDFUpload} className="mb-4" />
+
+      <button
+        className="mb-2 px-4 py-2 bg-green-600 text-white rounded"
+        onClick={handleCameraCapture}
+      >
+        {cameraUploadSuccess ? '✅ Správně nahráno' : '📷 Vyfotit dokument mobilem'}
+      </button>
+
+      <div className="flex gap-2 mb-4">
+        <label><input type="checkbox" checked={consentChecked} onChange={(e) => setConsentChecked(e.target.checked)} /> Souhlasím s podmínkami</label>
+        <label><input type="checkbox" checked={gdprChecked} onChange={(e) => setGdprChecked(e.target.checked)} /> GDPR</label>
+      </div>
+
+      <div className="flex gap-4 mb-6">
+        <button
+          className={`px-6 py-2 rounded text-white ${consentChecked && gdprChecked ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+          onClick={handleSubmit}
+          disabled={!consentChecked || !gdprChecked}
+        >
+          Přelož do člověčiny
+        </button>
+        <button
+          className="px-6 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          onClick={handleClear}
+        >
+          Vymazat vše
+        </button>
+      </div>
+
+      {loading && <div className="text-blue-600 mb-4">🔄 Zpracovávám... ({seconds}s)</div>}
+
+      {output && (
+        <div className="w-full max-w-2xl">
+          <h2 className="text-xl font-semibold mb-4">📄 Výstup:</h2>
+          {renderStructuredOutput()}
+
+          {!feedbackSubmitted && (
+            <div className="mt-8 bg-gray-100 border rounded p-4">
+              <p className="text-gray-800 font-medium mb-2">Byl pro vás výstup srozumitelný?</p>
+              <div className="flex gap-4 mb-3">
+                <button
+                  className={`py-2 px-4 rounded ${feedbackChoice === 'yes' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+                  onClick={() => {
+                    setFeedbackChoice('yes');
+                    setFeedbackVisible(true);
+                  }}
+                >
+                  Ano 👍
+                </button>
+                <button
+                  className={`py-2 px-4 rounded ${feedbackChoice === 'no' ? 'bg-red-600 text-white' : 'bg-gray-200'}`}
+                  onClick={() => {
+                    setFeedbackChoice('no');
+                    setFeedbackVisible(true);
+                  }}
+                >
+                  Ne 👎
+                </button>
+              </div>
+
+              {feedbackVisible && (
+                <>
+                  <textarea
+                    rows={3}
+                    className="w-full p-2 border border-gray-300 rounded mb-2"
+                    placeholder="Chcete něco dodat?"
+                    value={feedbackComment}
+                    onChange={(e) => setFeedbackComment(e.target.value)}
+                  />
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    onClick={handleFeedbackSubmit}
+                  >
+                    Odeslat zpětnou vazbu
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {feedbackSubmitted && (
+            <div className="mt-4 text-green-700 font-semibold">
+              Děkujeme za vaši zpětnou vazbu! 🙏
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
-
