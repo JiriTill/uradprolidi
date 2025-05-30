@@ -177,9 +177,12 @@ export default function Home() {
       <main className="p-6 font-sans flex-grow flex items-center justify-center">
         <div className="max-w-2xl w-full bg-white rounded-lg shadow-md p-8">
           <h1 className="text-4xl font-bold mb-2 text-center text-gray-900">Úřad pro lidi</h1>
-          <p className="mb-6 text-center text-gray-700">
-            Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
-          </p>
+            <p className="mb-2 text-center text-gray-700">
+              Úřady mluví jazykem, kterému rozumí jen úřady. My to přeložíme do člověčiny.
+            </p>
+            <p className="mb-6 text-center text-blue-700 font-medium">
+              Vložte svůj úřední dokument, kterému nerozumíte, a my vám ho přeložíme do srozumitelné řeči a řekneme vám, co po vás úředník vlastně chce.
+            </p>
 
           <p className="font-medium text-gray-800 mb-2">Vložte text, nebo nahrajte čitelný dokument (PDF nebo fotku):</p>
 
@@ -224,7 +227,7 @@ export default function Home() {
             </label>
             <label className="block">
               <input type="checkbox" className="mr-2" checked={gdprChecked} onChange={(e) => setGdprChecked(e.target.checked)} />
-              Souhlasím se zpracováním dat podle GDPR.
+              Souhlasím se zpracováním dat.
             </label>
           </div>
 
