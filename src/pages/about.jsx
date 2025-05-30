@@ -19,6 +19,14 @@ export default function About() {
           <strong>Úřad pro lidi</strong> pomáhá běžným lidem porozumět složitým dopisům, výzvám a dokumentům. Využívám umělou inteligenci (OpenAI), optické rozpoznávání textu (OCR) a jednoduchý design, abyste se konečně dozvěděli: <em>co se po vás chce, do kdy a jak to udělat</em>.
         </p>
 
+        <div className="flex justify-center my-6">
+          <img
+            src="/urednik.png"
+            alt="Úředník pracující na zjednodušení veřejné správy"
+            className="max-w-full md:max-w-md rounded-lg shadow"
+          />
+        </div>
+
         <p className="mb-4 text-gray-800 leading-relaxed">
           Tento nástroj je nezávislý, bez reklam a žádná data si neukládám. Pracuji na celém projektu sám za pomocí umělé inteligence. Chci, aby byl užitečný pro každého, kdo se v oficiálních dopisech ztrácí.
         </p>
