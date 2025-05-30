@@ -14,36 +14,70 @@ export default async function handler(req, res) {
   try {
     let messages = [];
 
-   if (type === 'image') {
-  messages = [
-    {
-      role: 'system',
-      content:
-        'Jsi překladač dokumentů pro veřejnost. Přelož úřední jazyk z obrázku do jednoduché češtiny. Strukturovaně rozděl výstup na části: O co se jedná, Co se po mně chce, Do kdy to mám udělat, Jak to mám udělat. Používej srozumitelný jazyk pro běžné lidi.',
-    },
-    {
-      role: 'user',
-      content: [
+    const basePrompt = `
+Přečti následující text oficiálního dokumentu (např. úřední dopis nebo oznámení) a převeď ho do lidsky srozumitelné formy podle této přehledné struktury. Pokud některé informace chybí, napiš „Neuvedeno“ nebo je odhadni z kontextu (označ jako *odhad*).
+
+Struktura výstupu:
+
+🏛️ Od koho je dopis:  
+[název úřadu nebo organizace]
+
+👤 Kdo záležitost vyřizuje:  
+[jméno a kontakt odpovědné osoby, pokud je uvedeno]
+
+🆔 Číslo jednací (č.j.):  
+[číslo jednací + krátké vysvětlení: slouží k identifikaci dokumentu pro úřad]
+
+🧾 Srozumitelný přehled:
+
+🟨 O co se jedná:  
+[stručné vysvětlení obsahu dopisu]
+
+🟨 Co se po mně chce:  
+[konkrétní požadavek]
+
+🟨 Kdy to mám udělat:  
+[termín nebo lhůta]
+
+🟨 Jak to mám udělat:  
+[způsob splnění požadavku]
+
+📌 Důsledky nesplnění:  
+[volitelně]
+
+📣 Upozornění:  
+[volitelně]
+
+Nyní zpracuj následující dokument:
+`;
+
+    if (type === 'image') {
+      messages = [
         {
-          type: 'image_url',
-          image_url: {
-            url: content,
-          },
+          role: 'system',
+          content: basePrompt,
         },
-      ],
-    },
-  ];
-     
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image_url',
+              image_url: {
+                url: content,
+              },
+            },
+          ],
+        },
+      ];
     } else {
       messages = [
         {
           role: 'system',
-          content:
-            'Jsi překladač dokumentů pro veřejnost. Přelož úřední jazyk do jednoduché češtiny. Strukturovaně rozděl výstup na části: O co se jedná, Co se po mně chce, Do kdy to mám udělat, Jak to mám udělat. Používej srozumitelný jazyk pro běžné lidi.',
+          content: basePrompt,
         },
         {
           role: 'user',
-          content,
+          content: `"""${content}"""`,
         },
       ];
     }
@@ -75,3 +109,4 @@ export default async function handler(req, res) {
     res.status(500).json({ result: '⚠️ Došlo k chybě při komunikaci s OpenAI.' });
   }
 }
+
