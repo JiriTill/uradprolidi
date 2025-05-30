@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
@@ -9,6 +9,22 @@ export default function Home() {
   const [output, setOutput] = useState('');
   const [pdfText, setPdfText] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [cameraUploadSuccess, setCameraUploadSuccess] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [gdprChecked, setGdprChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setInterval(() => setSeconds((s) => s + 1), 1000);
+    } else {
+      clearInterval(timer);
+      setSeconds(0);
+    }
+    return () => clearInterval(timer);
+  }, [loading]);
 
   const handlePDFUpload = (event) => {
     const file = event.target.files[0];
@@ -66,6 +82,7 @@ export default function Home() {
         reader.onloadend = () => {
           const base64Image = reader.result;
           setInputText(base64Image);
+          setCameraUploadSuccess(true);
           setUploadSuccess(true);
         };
         reader.readAsDataURL(file);
@@ -85,7 +102,8 @@ export default function Home() {
       return;
     }
 
-    setOutput('⏳ Probíhá zpracování...');
+    setOutput('');
+    setLoading(true);
 
     try {
       const isImage = inputText.startsWith('data:image/');
@@ -96,9 +114,7 @@ export default function Home() {
 
       const response = await fetch('/api/translate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -107,6 +123,8 @@ export default function Home() {
     } catch (error) {
       console.error(error);
       setOutput('⚠️ Došlo k chybě při komunikaci se serverem.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,6 +133,11 @@ export default function Home() {
     setOutput('');
     setPdfText('');
     setUploadSuccess(false);
+    setCameraUploadSuccess(false);
+    setConsentChecked(false);
+    setGdprChecked(false);
+    setLoading(false);
+    setSeconds(0);
   };
 
   const renderStructuredOutput = () => {
@@ -162,9 +185,7 @@ export default function Home() {
                   onChange={handlePDFUpload}
                   className="block"
                 />
-                {uploadSuccess && (
-                  <span className="text-green-600 text-xl" title="Soubor nahrán správně">✅</span>
-                )}
+                {uploadSuccess && <span className="text-green-600 text-xl">✅</span>}
               </div>
             </div>
 
@@ -174,7 +195,7 @@ export default function Home() {
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
                 onClick={handleCameraCapture}
               >
-                📷 Vyfotit dokument mobilem
+                {cameraUploadSuccess ? '✅ Správně nahráno' : '📷 Vyfotit dokument mobilem'}
               </button>
               <p className="text-sm text-gray-600 mt-1">Funguje jen na mobilu. Text na fotce musí být dobře čitelný.</p>
             </div>
@@ -182,17 +203,24 @@ export default function Home() {
 
           <div className="bg-gray-50 rounded border p-4 mb-6 text-sm text-gray-700 space-y-2">
             <label className="block">
-              <input type="checkbox" className="mr-2" /> Rozumím, že výstup není právní rada.
+              <input type="checkbox" className="mr-2" checked={consentChecked} onChange={(e) => setConsentChecked(e.target.checked)} />
+              Rozumím, že výstup není právní rada.
             </label>
             <label className="block">
-              <input type="checkbox" className="mr-2" /> Souhlasím se zpracováním dat podle GDPR.
+              <input type="checkbox" className="mr-2" checked={gdprChecked} onChange={(e) => setGdprChecked(e.target.checked)} />
+              Souhlasím se zpracováním dat podle GDPR.
             </label>
           </div>
 
           <div className="flex gap-4 mb-4">
             <button
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow"
+              className={`flex-1 py-3 rounded-lg text-lg font-semibold transition shadow ${
+                consentChecked && gdprChecked
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-400 text-white cursor-not-allowed'
+              }`}
               onClick={handleSubmit}
+              disabled={!consentChecked || !gdprChecked}
             >
               Přelož do člověčiny
             </button>
@@ -204,7 +232,14 @@ export default function Home() {
             </button>
           </div>
 
-          {output && (
+          {loading && (
+            <div className="flex items-center gap-2 text-blue-600 text-sm mt-4">
+              <span className="animate-spin">🔄</span>
+              <span>Zpracovávám... ({seconds}s)</span>
+            </div>
+          )}
+
+          {output && !loading && (
             <div className="mt-10">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Výstup:</h2>
               {renderStructuredOutput()}
@@ -224,4 +259,3 @@ export default function Home() {
     </div>
   );
 }
-
