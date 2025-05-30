@@ -8,11 +8,11 @@ export default function About() {
         <h1 className="text-3xl font-bold mb-4 text-gray-900">O projektu</h1>
 
         <p className="mb-4 text-gray-800 leading-relaxed">
-          Jmenuji se Jirka a přiznám se rovnou — úřední dopisy mě vždycky dokázaly dostat. Tolik paragrafů, nejasností a vět na deset řádků. Často jsem z nich měl chuť brečet, protože jsem si nebyl jistý, co se po mně vlastně chce.
+          Jmenuji se Jirka a rovnou se přiznám — úřední dopisy mě vždycky dokázaly dostat. Tolik paragrafů, nejasností a vět na deset řádků. Často jsem z nich měl chuť brečet, protože jsem si nebyl jistý, co se po mně vlastně chce. Někdy jsem si říkal, jestli nám to ti úředníci a právníci nedělají schválně!
         </p>
 
         <p className="mb-4 text-gray-800 leading-relaxed">
-          Pak se stala ironie osudu — začal jsem pracovat ve veřejné správě. Už je to skoro 7 let, co denně narážím na ten samý problém, jen z druhé strany. A tak vznikl nápad: vytvořit jednoduchý překladač úředních dokumentů do „člověčiny“.
+          Pak se stala ironie osudu — začal jsem pracovat ve veřejné správě. Ano, jako úředník. Už je to skoro 7 let. Denně narážím na ten samý problém, jen z druhé strany. A tak vznikl nápad: vytvořit jednoduchý překladač úředních dokumentů do „člověčiny“.
         </p>
 
         <p className="mb-4 text-gray-800 leading-relaxed">
