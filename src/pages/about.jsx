@@ -2,7 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 
-export default function About() {
+export default function AboutPage() {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-between">
       <main className="p-6 max-w-3xl mx-auto">
@@ -44,52 +51,50 @@ export default function About() {
           Zpět k překladu do člověčiny
         </Link>
 
-            <h2 className="text-2xl font-bold mt-12 mb-4 text-gray-900">📬 Napište mi</h2>
-            <form
-              action="https://formspree.io/f/mdkznadv" // ← sem vlož svůj endpoint
-              method="POST"
-              className="bg-white p-6 rounded-lg shadow-md space-y-4"
+          <h2 className="text-2xl font-bold mt-12 mb-4 text-gray-900">📬 Napište mi</h2>
+          <form
+            action="https://formspree.io/f/mdkznadv" // ← sem vlož svůj endpoint
+            method="POST"
+            className="bg-white p-6 rounded-lg shadow-md space-y-4"
+          >
+            <div>
+              <label className="block font-medium mb-1">Jméno</label>
+              <input
+                type="text"
+                name="name"
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">E-mail</label>
+              <input
+                type="email"
+                name="email"
+                required
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Zpráva</label>
+              <textarea
+                name="message"
+                required
+                rows={4}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            {/* Spam protection (honeypot) */}
+            <input type="text" name="_gotcha" className="hidden" />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
             >
-              <div>
-                <label className="block font-medium mb-1">Jméno</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">E-mail</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Zpráva</label>
-                <textarea
-                  name="message"
-                  required
-                  rows={4}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              {/* Spam protection (honeypot) */}
-              <input type="text" name="_gotcha" className="hidden" />
-              <button
-                type="submit"
-                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-              >
-                Odeslat zprávu
-              </button>
-            </form>
-
+              Odeslat zprávu
+            </button>
+          </form>
       </main>
       <Footer />
     </div>
   );
 }
-
