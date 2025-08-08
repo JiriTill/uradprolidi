@@ -53,12 +53,12 @@ export default function HowItWorks() {
           Vaše dokumenty se neukládají. Nepoužíváme žádné trackery, cookies ani reklamy. Cílem je čistá pomoc — bez háčků.
         </p>
 
-        <Link
-          to="/"
-          className="inline-block mt-8 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          Zpět k překladu do člověčiny
-        </Link>
+          <Link
+            to="/"
+            className="inline-block mt-8 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Zpět k překladu do člověčiny
+          </Link>
       </main>
       <Footer />
     </div>
