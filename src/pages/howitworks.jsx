@@ -56,6 +56,7 @@ export default function HowItWorks() {
           <Link
             to="/"
             className="inline-block mt-8 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            onClick={scrollToTop}
           >
             Zpět k překladu do člověčiny
           </Link>
