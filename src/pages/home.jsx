@@ -4,6 +4,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import FeedbackForm from '../components/FeedbackForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faCamera, faCheckCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import Footer from '../components/Footer';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -320,22 +321,7 @@ export default function Home() {
           )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full text-center text-sm text-gray-600 py-6">
-        <div className="space-x-4 mb-2">
-          <a href="/o-projektu" className="hover:underline">
-            O projektu
-          </a>
-          <a href="/jak-to-funguje" className="hover:underline">
-            Jak to funguje
-          </a>
-          <a href="/gdpr" className="hover:underline">
-            Zpracování dat
-          </a>
-        </div>
-        <p className="mt-2">&copy; {new Date().getFullYear()} Úřad pro lidi</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
